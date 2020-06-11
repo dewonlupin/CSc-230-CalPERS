@@ -1,0 +1,5 @@
+Windows:
+https://www.ionos.com/digitalguide/server/tools/xampp-tutorial-create-your-own-local-test-server/
+
+OSX:
+https://www.webucator.com/how-to/how-install-start-test-xampp-on-mac-osx.cfm
