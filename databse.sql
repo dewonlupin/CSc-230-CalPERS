@@ -1,5 +1,9 @@
 -- Creating Database
 CREATE DATABASE IF NOT EXISTS user_database;
+USE user_database;
+
+-- Dropping users table
+DROP TABLE IF EXISTS `users`;
 
 -- Table structure for table `users`
 CREATE TABLE `users` (
@@ -11,7 +15,9 @@ CREATE TABLE `users` (
   `calpersid` varchar(10) NOT NULL,
   `company` varchar(50) NOT NULL,
   `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL
+  `password` varchar(255) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `verified` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Indexes for table `users`
