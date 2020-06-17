@@ -8,7 +8,7 @@ $confirm_password = $employee = $calpers_id = $company =  "";
 $firstname_err = $lastname_err = $email_err = $role_err = $password_err = "";
 $confirm_password_err = $employee_err = $calpers_id_err = $company_err = "";
 
-// Processing form data when form is submitted
+// Processing form data when form is submitted	
 if($_SERVER["REQUEST_METHOD"] == "POST"){
 
     // Validate email
@@ -105,7 +105,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             document.getElementById('outsider_block').style.display = 'block';
         }
 
-    }
+}
 </script>
 
 <!DOCTYPE html>
