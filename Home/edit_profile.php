@@ -94,12 +94,12 @@
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h1 class="m-0 text-dark">Signature</h1>
+              <h1 class="m-0 text-dark">Edit Profile</h1>
             </div><!-- /.col -->
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
                 <li class="breadcrumb-item"><a href="#" style="color: #276a91">Home</a></li>
-                <li class="breadcrumb-item active">Signature</li>
+                <li class="breadcrumb-item active">Edit profile</li>
               </ol>
             </div><!-- /.col -->
           </div><!-- /.row -->
@@ -111,103 +111,59 @@
         <div class="container-fluid">
           <div class="row">
             <div class="col-12">
-              <!-- Custom Tabs -->
-              <div class="card">
-                <div class="card-header d-flex p-0">
-                  <ul class="nav nav-pills ml-auto p-2">
-                    <li class="nav-item"><a class="nav-link active" href="#tab_1" data-toggle="tab">Draw</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#tab_2" data-toggle="tab">Upload</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab">Saved Signature</a></li>
-                  </ul>
-                </div><!-- /.card-header -->
-                <div class="card-body">
-                  <div class="tab-content">
-                    <div class="tab-pane active" id="tab_1">
-                      <div id="signature-pad" class="signature-pad">
-                        <div class="signature-pad--body" >
-                          <canvas class="canvasbody" style="height: 400px !important;"></canvas>
-                        </div>
-                        <div class="signature-pad--footer">
-                          <div class="description">Sign above</div>
-
-                          <div class="signature-pad--actions">
-                            <div>
-                              <button type="button" class="button clear" data-action="clear">Clear</button>
-                              <button type="button" class="button" data-action="change-color">Change color</button>
-                              <form action="app.js" method="GET">
-                                <button type="submit" data-jscolor="{valueElement:'hexclr',value:'pick color'}" class="button" data-action="change-color">Pick color</button>
-                                (chosen color: <input id="hexclr" type="text">)
-                              </form>
-
-                              <button type="button" class="button" data-action="undo">Undo</button>
-
-                            </div>
-                            <div>
-                              <button type="button" class="button save" data-action="save-png">Save as PNG</button>
-                              <button type="button" class="button save" data-action="save-jpg">Save as JPG</button>
-                              <button type="button" class="button save" data-action="save-svg">Save as SVG</button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <script src="js/signature_pad.js"></script>
-                      <script src="js/app.js"></script>
-                      <script src="js/jscolor.js"></script>
+                <div class="card">
+                <br><br>
+                <div class="col-9 offset-1">
+            <form class="form-horizontal" action='' method="POST">
+                <fieldset>
+                 
+                    <div class="control-group">
+                    <!-- Username -->
+                    <label class="control-label"  for="username">Username</label>
+                    <div class="controls">
+                        <input type="text" id="username" name="username" placeholder="" class="input-xlarge">
+                        <p class="help-block">Username can contain any letters or numbers, without spaces</p>
                     </div>
-                    <!-- /.tab-pane -->
-                    <div class="tab-pane" id="tab_2">
-                      <div class="row">
-          <!-- left column -->
-          <div class="col-md-6">
-            <!-- general form elements -->
-            <div class="card card-primary">
-              
-              <!-- /.card-header -->
-              <!-- form start -->
-              <form role="form">
-                <div class="card-body">
-                  
-                  
-                  <div class="form-group">
-                    <label for="exampleInputFile">File input</label>
-                    <div class="input-group">
-                      <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="exampleInputFile">
-                        <label class="custom-file-label" for="exampleInputFile">Choose file</label>
-                      </div>
-                      <div class="input-group-append">
-                        <span class="input-group-text" id="">Upload</span>
-                      </div>
                     </div>
-                  </div>
-                  </div>
-                </div>
-                <!-- /.card-body -->
-
                 
-              </form>
-            </div>
-            <!-- /.card -->
-
-            
-
-          </div>
-          <!--/.col (left) -->
-          <!-- right column -->
-          
-          <!--/.col (right) -->
-        </div>
-                    <!-- /.tab-pane -->
-                    <div class="tab-pane" id="tab_3">
-                     
+                    <div class="control-group">
+                    <!-- E-mail -->
+                    <label class="control-label" for="email">E-mail</label>
+                    <div class="controls">
+                        <input type="text" id="email" name="email" placeholder="" class="input-xlarge">
+                        <p class="help-block">Please provide your E-mail</p>
                     </div>
-                    <!-- /.tab-pane -->
-                  </div>
-                  <!-- /.tab-content -->
-                </div><!-- /.card-body -->
-              </div>
-              <!-- ./card -->
+                    </div>
+                
+                    <div class="control-group">
+                    <!-- Password-->
+                    <label class="control-label" for="password">Password</label>
+                    <div class="controls">
+                        <input type="password" id="password" name="password" placeholder="" class="input-xlarge">
+                        <p class="help-block">Password should be at least 4 characters</p>
+                    </div>
+                    </div>
+                
+                    <div class="control-group">
+                    <!-- Password -->
+                    <label class="control-label"  for="password_confirm">Password (Confirm)</label>
+                    <div class="controls">
+                        <input type="password" id="password_confirm" name="password_confirm" placeholder="" class="input-xlarge">
+                        <p class="help-block">Please confirm password</p>
+                    </div>
+                    </div>
+                
+                    <div class="control-group">
+                    <!-- Button -->
+                    <div class="controls">
+                        <button class="btn btn-success">Save Profile</button>
+                    </div>
+                    </div>
+                </fieldset>
+                </div>
+                </form>
+                    </div>
+
             </div>
             <!-- /.col -->
           </div>
@@ -265,5 +221,9 @@
 <script src="dist/js/pages/dashboard.js"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="dist/js/demo.js"></script>
+
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 </body>
 </html>

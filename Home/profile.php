@@ -60,6 +60,99 @@
   font-family: Helvetica, Sans-Serif;
 }
 
+.emp-profile{
+    padding: 3%;
+    margin-top: 3%;
+    margin-bottom: 3%;
+    border-radius: 0.5rem;
+    background: #fff;
+}
+.profile-img{
+    text-align: center;
+}
+.profile-img img{
+    width: 70%;
+    height: 100%;
+}
+.profile-img .file {
+    position: relative;
+    overflow: hidden;
+    margin-top: -20%;
+    width: 70%;
+    border: none;
+    border-radius: 0;
+    font-size: 15px;
+    background: #212529b8;
+}
+.profile-img .file input {
+    position: absolute;
+    opacity: 0;
+    right: 0;
+    top: 0;
+}
+.profile-head h5{
+    color: #333;
+}
+.profile-head h6{
+    color: #0062cc;
+}
+.profile-edit-btn{
+    border: none;
+    border-radius: 1.5rem;
+    width: 70%;
+    padding: 2%;
+    font-weight: 600;
+    color: #6c757d;
+    cursor: pointer;
+}
+.proile-rating{
+    font-size: 12px;
+    color: #818182;
+    margin-top: 5%;
+}
+.proile-rating span{
+    color: #495057;
+    font-size: 15px;
+    font-weight: 600;
+}
+.profile-head .nav-tabs{
+    margin-bottom:5%;
+}
+.profile-head .nav-tabs .nav-link{
+    font-weight:600;
+    border: none;
+}
+.profile-head .nav-tabs .nav-link.active{
+    border: none;
+    border-bottom:2px solid #0062cc;
+}
+.profile-work{
+    padding: 14%;
+    margin-top: -15%;
+}
+.profile-work p{
+    font-size: 12px;
+    color: #818182;
+    font-weight: 600;
+    margin-top: 10%;
+}
+.profile-work a{
+    text-decoration: none;
+    color: #495057;
+    font-weight: 600;
+    font-size: 14px;
+}
+.profile-work ul{
+    list-style: none;
+}
+.profile-tab label{
+    font-weight: 600;
+}
+.profile-tab p{
+    font-weight: 600;
+    color: #0062cc;
+}
+
   </style>
 
 
@@ -81,140 +174,85 @@
 
 
 </head>
-
-      <!-- Sidebar -->
       <?php include 'sidebar.php'; ?>
-      <!-- /.sidebar -->
     </aside>
 
     <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper">
-      <!-- Content Header (Page header) -->
-      <div class="content-header">
-        <div class="container-fluid">
-          <div class="row mb-2">
-            <div class="col-sm-6">
-              <h1 class="m-0 text-dark">Signature</h1>
-            </div><!-- /.col -->
-            <div class="col-sm-6">
-              <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item"><a href="#" style="color: #276a91">Home</a></li>
-                <li class="breadcrumb-item active">Signature</li>
-              </ol>
-            </div><!-- /.col -->
-          </div><!-- /.row -->
-        </div><!-- /.container-fluid -->
-      </div>
-      <!-- /.content-header -->
-      <!-- Main content -->
-      <section class="content">
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-12">
-              <!-- Custom Tabs -->
-              <div class="card">
-                <div class="card-header d-flex p-0">
-                  <ul class="nav nav-pills ml-auto p-2">
-                    <li class="nav-item"><a class="nav-link active" href="#tab_1" data-toggle="tab">Draw</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#tab_2" data-toggle="tab">Upload</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab">Saved Signature</a></li>
-                  </ul>
-                </div><!-- /.card-header -->
-                <div class="card-body">
-                  <div class="tab-content">
-                    <div class="tab-pane active" id="tab_1">
-                      <div id="signature-pad" class="signature-pad">
-                        <div class="signature-pad--body" >
-                          <canvas class="canvasbody" style="height: 400px !important;"></canvas>
-                        </div>
-                        <div class="signature-pad--footer">
-                          <div class="description">Sign above</div>
-
-                          <div class="signature-pad--actions">
-                            <div>
-                              <button type="button" class="button clear" data-action="clear">Clear</button>
-                              <button type="button" class="button" data-action="change-color">Change color</button>
-                              <form action="app.js" method="GET">
-                                <button type="submit" data-jscolor="{valueElement:'hexclr',value:'pick color'}" class="button" data-action="change-color">Pick color</button>
-                                (chosen color: <input id="hexclr" type="text">)
-                              </form>
-
-                              <button type="button" class="button" data-action="undo">Undo</button>
-
-                            </div>
-                            <div>
-                              <button type="button" class="button save" data-action="save-png">Save as PNG</button>
-                              <button type="button" class="button save" data-action="save-jpg">Save as JPG</button>
-                              <button type="button" class="button save" data-action="save-svg">Save as SVG</button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <script src="js/signature_pad.js"></script>
-                      <script src="js/app.js"></script>
-                      <script src="js/jscolor.js"></script>
-                    </div>
-                    <!-- /.tab-pane -->
-                    <div class="tab-pane" id="tab_2">
-                      <div class="row">
-          <!-- left column -->
-          <div class="col-md-6">
-            <!-- general form elements -->
-            <div class="card card-primary">
-              
-              <!-- /.card-header -->
-              <!-- form start -->
-              <form role="form">
-                <div class="card-body">
-                  
-                  
-                  <div class="form-group">
-                    <label for="exampleInputFile">File input</label>
-                    <div class="input-group">
-                      <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="exampleInputFile">
-                        <label class="custom-file-label" for="exampleInputFile">Choose file</label>
-                      </div>
-                      <div class="input-group-append">
-                        <span class="input-group-text" id="">Upload</span>
-                      </div>
-                    </div>
-                  </div>
-                  </div>
-                </div>
-                <!-- /.card-body -->
-
-                
-              </form>
-            </div>
-            <!-- /.card -->
-
+    <div class="container emp-profile d-flex justify-content-center">
+            <!-- edit form column -->
+            <div class="col-md-8 col-sm-6 col-xs-12 personal-info">
             
-
-          </div>
-          <!--/.col (left) -->
-          <!-- right column -->
-          
-          <!--/.col (right) -->
-        </div>
-                    <!-- /.tab-pane -->
-                    <div class="tab-pane" id="tab_3">
-                     
+            <h3 class="d-flex justify-content-center">Personal info</h3>
+            <br><br>
+            <form class="form-horizontal" role="form">
+                <div class="form-group row">
+                <label class="col-lg-3 control-label ">First name:</label>
+                <div class="col-lg-8">
+                    <input class="form-control edit-profile" value="Jane" type="text" disabled>
+                </div>
+                </div>
+                <div class="form-group row">
+                <label class="col-lg-3 control-label">Last name:</label>
+                <div class="col-lg-8">
+                    <input class="form-control edit-profile" value="Bishop" type="text" disabled>
+                </div>
+                </div>
+                <div class="form-group row">
+                <label class="col-lg-3 control-label">Nick name:</label>
+                <div class="col-lg-8">
+                    <input class="form-control edit-profile" value="Henrry" type="text" disabled>
+                </div>
+                </div>
+                <div class="form-group row">
+                <label class="col-lg-3 control-label">Company:</label>
+                <div class="col-lg-8">
+                    <input class="form-control edit-profile" value="" type="text" disabled>
+                </div>
+                </div>
+                <div class="form-group row">
+                <label class="col-lg-3 control-label">Email:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" value="janesemail@gmail.com" type="text" disabled>
+                </div>
+                </div>
+                <div class="form-group row">
+                <label class="col-lg-3 control-label ">Time Zone:</label>
+                <div class="col-lg-8">
+                    <div class="ui-select">
+                    <select id="user_time_zone" class="form-control edit-profile" disabled>
+                        <option value="Hawaii">(GMT-10:00) Hawaii</option>
+                        <option value="Alaska">(GMT-09:00) Alaska</option>
+                        <option value="Pacific Time (US & Canada)">(GMT-08:00) Pacific Time (US & Canada)</option>
+                        <option value="Arizona">(GMT-07:00) Arizona</option>
+                        <option value="Mountain Time (US & Canada)">(GMT-07:00) Mountain Time (US & Canada)</option>
+                        <option value="Central Time (US & Canada)" selected="selected">(GMT-06:00) Central Time (US & Canada)</option>
+                        <option value="Eastern Time (US & Canada)">(GMT-05:00) Eastern Time (US & Canada)</option>
+                        <option value="Indiana (East)">(GMT-05:00) Indiana (East)</option>
+                    </select> 
                     </div>
-                    <!-- /.tab-pane -->
-                  </div>
-                  <!-- /.tab-content -->
-                </div><!-- /.card-body -->
-              </div>
-              <!-- ./card -->
+                </div>
+                </div>
+                <div class="form-group row">
+                <label class="col-md-3 control-label">Username:</label>
+                <div class="col-md-8">
+                    <input class="form-control edit-profile" value="janeuser" type="text" disabled>
+                </div>
+                </div>
+                
+                <div class="form-group row">
+                <label class="col-md-3 control-label"></label>
+                <div class="col-md-8">
+                    <input class="btn btn-primary" value="Save Changes" type="button" id="save" style="display:none">
+                    
+                    <span></span>
+                    <input class="btn btn-primary" value="Edit Profile" type="button" id="edit" onclick="editprofile()">
+                    <span></span>
+                    <input class="btn btn-default" value="Cancel" type="reset" id="cancel"style="display:none" onclick="cancel()">
+                </div>
+                </div>
+            </form>
             </div>
-            <!-- /.col -->
-          </div>
-        </div><!-- /.container-fluid -->
-      </section>
-      <!-- /.content -->
-    </div>
+        </div>
     <!-- /.content-wrapper -->
     <footer class="main-footer">
 
@@ -238,6 +276,10 @@
 <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
 <script>
   $.widget.bridge('uibutton', $.ui.button)
+
+  $(document).ready(function(){
+
+});
 </script>
 <!-- Bootstrap 4 -->
 <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -265,5 +307,54 @@
 <script src="dist/js/pages/dashboard.js"></script>
 <!-- AdminLTE for demo purposes -->
 <script src="dist/js/demo.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+
+<script> 
+    function editprofile() {
+    $("#edit").hide();
+    $('.edit-profile').removeAttr("disabled");
+
+    $("#save").show();
+    $("#cancel").show();
+
+    }
+
+    function cancelgg() {
+    $("#edit").show();
+    $('.edit-profile').addAttr("disabled");
+
+    $("#save").hide();
+    $("#cancel").hide();
+    }
+
+
+$( "#cancel" ).click(function() {
+    $("#save").hide();
+    $("#cancel").hide();
+  $("#edit").show();
+    $('.edit-profile').attr("disabled", true);
+
+    
+});
+
+
+$( "#save" ).click(function() {
+    $("#save").hide();
+    $("#cancel").hide();
+  $("#edit").show();
+    $('.edit-profile').attr("disabled", true);
+
+    swal({
+  title: "Profile Updated Successfully!",
+  icon: "success",
+});
+
+    
+});
+
+</script>
 </body>
 </html>
