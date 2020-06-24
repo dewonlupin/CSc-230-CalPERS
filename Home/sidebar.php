@@ -12,7 +12,7 @@
             </ul>
             <ul class="navbar-nav">
                 <li class="nav-item">
-                        <a href="../logout.php" class="btn btn-danger">Sign Out of Your Account</a>      
+                        <a href="logout.php" class="btn btn-danger">Sign Out of Your Account</a>      
                 </li>
                
             </ul>
@@ -21,7 +21,7 @@
 </div>
 
 
-      <!-- <a href="../logout.php" class="btn btn-danger">Sign Out of Your Account</a> -->
+      <!-- <a href="logout.php" class="btn btn-danger">Sign Out of Your Account</a> -->
 
       <!-- Right navbar links -->
       
@@ -63,7 +63,7 @@
             </li>
 
             <li class="nav-item">
-              <a href="index.html" class="nav-link">
+              <a href="reset-password.php" class="nav-link">
                 <i class="nav-icon fa fa-key"></i>
                 <p>
                   Reset Password

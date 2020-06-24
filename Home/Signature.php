@@ -34,7 +34,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
-  <!--<link rel="stylesheet" href="css/signature-pad.css">-->
+  <!--<link rel="stylesheet" href="build/css/signature-pad.css">-->
   
   <style type="text/css">
 
@@ -64,7 +64,7 @@
 
 
   <!--[if IE]>
-    <link rel="stylesheet" type="text/css" href="css/ie9.css">
+    <link rel="stylesheet" type="text/css" href="build/css/ie9.css">
   <![endif]-->
 
   <script type="text/javascript">
