@@ -123,37 +123,50 @@
                 <div class="card-body">
                   <div class="tab-content">
                     <div class="tab-pane active" id="tab_1">
-                      <div id="signature-pad" class="signature-pad">
-                        <div class="signature-pad--body" >
-                          <canvas class="canvasbody" style="height: 400px !important;"></canvas>
-                        </div>
-                        <div class="signature-pad--footer">
-                          <div class="description">Sign above</div>
+                        <div id="signature-pad" class="signature-pad">
+						<div class="signature-pad--body">
+						
+						  <canvas class="canvasbody" style="height: 400px !important;"></canvas>
+						 
+						  
+						</div>
+						<div class="signature-pad--footer">
+						  <div class="description">Sign above</div>
 
-                          <div class="signature-pad--actions">
-                            <div>
-                              <button type="button" class="button clear" data-action="clear">Clear</button>
-                              <button type="button" class="button" data-action="change-color">Change color</button>
-                              <form action="app.js" method="GET">
-                                <button type="submit" data-jscolor="{valueElement:'hexclr',value:'pick color'}" class="button" data-action="change-color">Pick color</button>
-                                (chosen color: <input id="hexclr" type="text">)
-                              </form>
+						  <div class="signature-pad--actions">
+							<div class="row col-md-9">
+							  <button type="button" class="col-md-3 offset-md-1 btn btn-primary btn-block" style="margin:5px; margin-top:5px;" data-action="clear">Clear</button>
+							  <button type="button" class="col-md-3 offset-md-1 btn btn-primary btn-block" data-action="undo">Undo</button>
+							  <button type="button" class="col-md-3 offset-md-1 btn btn-primary btn-block" data-action="change-color">Save Signature</button>
+							  
 
-                              <button type="button" class="button" data-action="undo">Undo</button>
-
-                            </div>
-                            <div>
-                              <button type="button" class="button save" data-action="save-png">Save as PNG</button>
-                              <button type="button" class="button save" data-action="save-jpg">Save as JPG</button>
-                              <button type="button" class="button save" data-action="save-svg">Save as SVG</button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+							</div>
+							<div class="row" style="margin-top:5px;margin-bottom:5px"></div>
+							<div class="row col-md-9" >
+								<button type="button" data-jscolor="{valueElement:'hexclr',value:'pick color', hash:true}" class="col-md-3  btn btn-primary btn-block" style="margin-left:6px;">Pick color</button>
+								<b class="col-md-3 offset-md-1"> Choosen color:<input id="hexclr"  name="hexclr" size="6" type="text"/></b>
+								<button class="col-md-3 offset-md-1 btn btn-primary btn-block" onclick="setcolor(document.getElementById('hexclr').value)"  type="button" style="margin-left:77px;">Select color</button>
+							</div>
+							
+							<div class="row" style="margin-top:5px;margin-bottom:5px"></div>
+							
+							<div class="row col-md-9">
+							  <button type="button" class="col-md-3  btn btn-primary btn-block" data-action="save-png" style="margin:5px; margin-top:4px;">Download as PNG</button>
+							  <button type="button" class="col-md-3  offset-md-1 btn btn-primary btn-block" data-action="save-jpg">Download as JPG</button>
+							  <button type="button" class="col-md-3  offset-md-1 btn btn-primary btn-block" data-action="save-svg">Download as SVG</button>
+							</div>
+						  </div>
+						</div>
+					</div>
 
                       <script src="js/signature_pad.js"></script>
                       <script src="js/app.js"></script>
                       <script src="js/jscolor.js"></script>
+					  <script>
+						function setcolor(pcolor){
+							signaturePad.penColor = pcolor;
+						}
+					  </script>
                     </div>
                     <!-- /.tab-pane -->
                     <div class="tab-pane" id="tab_2">
