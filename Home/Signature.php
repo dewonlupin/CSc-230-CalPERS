@@ -1,3 +1,174 @@
+<?php
+// Include config file
+require_once "config.php";
+
+// Initialize the session
+session_start();
+
+// Check if the user is logged in, if not then redirect them to login page
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true)
+{
+    header("location: login.php");
+    exit;
+}
+
+$signature = "";
+$stmt = "";
+$counter = 1;
+$tab_value = "";
+//$image = "";
+
+if (isset($_GET["tab"]))
+{
+    $tab_value = $_GET["tab"];
+}
+
+// Processing when file uploads
+if (isset($_POST["submit"]))
+{
+    if (!isset($_FILES["fileToUpload"]))
+    {
+        echo "erros";
+    }
+    else
+    {
+        //getting information for the uploaded file
+        $info = pathinfo($_FILES['fileToUpload']['name']);
+        $ext = $info['extension'];
+        $target = "uploaded_file." . $ext;
+        move_uploaded_file($_FILES['fileToUpload']['tmp_name'], $target);
+        if (exec("python signature_processing.py -i ".$target)){
+        }
+        else
+        {
+            //echo "python did not execute correctly";
+        }
+
+        if (file_get_contents('Prep_img.jpg'))
+        {
+            // opening and reading the file that python script generated.
+            $image = file_get_contents('Prep_img.jpg');
+            //preparing SQL statement
+            $sql = "INSERT INTO signatures (user_id,image) VALUES (?,?)";
+            if ($stmt = mysqli_prepare($link, $sql))
+            {
+                mysqli_stmt_bind_param($stmt, "is", $param_user_id, $param_image);
+                $param_image = $image;
+                $param_user_id = $_SESSION["id"];
+
+                if (mysqli_stmt_execute($stmt))
+                {
+                    //closes the statement
+                    mysqli_stmt_close($stmt);
+                }
+                else
+                {
+                    echo "Failed executing the SQL statement. Please try again later.";
+                }
+
+            }
+            else
+            {
+                echo "Failed at preparing the SQL statment.";
+            }
+        }
+        else
+        {
+            echo "could not find the file the python script generated.";
+        }
+    }
+
+}
+// Processing when a signature is requested to be removed
+if (isset($_GET['rm_id']))
+{
+    // setting tab value to third tab, so after deleting the signure user still stays on saved signature tab.
+    $tab_value = "t3";
+    //preparing sql statement
+    $sql = "SELECT id FROM signatures WHERE id = ?";
+    if ($stmt = mysqli_prepare($link, $sql))
+    {
+        mysqli_stmt_bind_param($stmt, "i", $param_rm);
+        // Set parameters
+        $param_rm = $_GET['rm_id'];
+        if (mysqli_stmt_execute($stmt))
+        {
+            // Store result
+            mysqli_stmt_store_result($stmt);
+
+            // Check if signature exists, if yes then we remove it
+            if (mysqli_stmt_num_rows($stmt) == 1)
+            {
+                mysqli_stmt_close($stmt);
+
+                $sql = "DELETE FROM signatures WHERE id = ?";
+                if ($stmt = mysqli_prepare($link, $sql))
+                {
+
+                    mysqli_stmt_bind_param($stmt, "i", $param_rm);
+                    // Set parameters
+                    $param_rm = $_GET['rm_id'];
+
+                    if (mysqli_stmt_execute($stmt))
+                    {
+
+                    }
+                    else
+                    {
+
+                    }
+                }
+
+                // Close statement
+                mysqli_stmt_close($stmt);
+            }
+            else
+            {
+                //echo "Signature does not exist";
+
+            }
+        }
+        else
+        {
+            //echo "failed at executing the statement.";
+
+        }
+
+    }
+    else
+    {
+        echo " failed at preparing the statement.";
+    }
+
+}
+
+// preparing statement to load the signatures
+$sql = "SELECT id, created,image FROM signatures WHERE user_id = ?";
+if ($stmt = mysqli_prepare($link, $sql))
+{
+    mysqli_stmt_bind_param($stmt, "i", $param_user_id);
+    $param_user_id = $_SESSION["id"];
+    if (mysqli_stmt_execute($stmt))
+    {
+        mysqli_stmt_store_result($stmt);
+        if (mysqli_stmt_num_rows($stmt))
+        {
+            mysqli_stmt_bind_result($stmt, $id, $created, $signature);
+        }
+    }
+    else
+    {
+        echo "failed at execting the SQL statement.";
+    }
+
+}
+
+//close connection
+mysqli_close($link);
+
+?>
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -34,10 +205,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
-  <!--<link rel="stylesheet" href="build/css/signature-pad.css">-->
-  
+<!--<link rel="stylesheet" href="build/css/signature-pad.css">-->
   <style type="text/css">
 
+  td, th{
+      text-align: center;
+  }
     .canvasbody {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -63,6 +236,24 @@
   </style>
 
 
+  <script type="text/javascript">
+
+  // viewing images in full screen
+  $(document).ready(function() {
+  $('.image-link').magnificPopup({type:'image'});
+  });
+  </script>
+
+
+  <script type="text/javascript">
+// forces the page to stay on correct tab after page loads
+  window.addEventListener('load', function () {
+    document.getElementById('<?php echo $tab_value; ?>').click();
+  })
+
+  </script>
+
+
   <!--[if IE]>
     <link rel="stylesheet" type="text/css" href="build/css/ie9.css">
   <![endif]-->
@@ -77,10 +268,16 @@
       ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
     })();
+
+
+
   </script>
 
 
+
 </head>
+<body>
+
 
       <!-- Sidebar -->
       <?php include 'sidebar.php'; ?>
@@ -98,7 +295,7 @@
             </div><!-- /.col -->
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item"><a href="#" style="color: #276a91">Home</a></li>
+                <li class="breadcrumb-item"><a href="profile.php" style="color: #276a91">Home</a></li>
                 <li class="breadcrumb-item active">Signature</li>
               </ol>
             </div><!-- /.col -->
@@ -116,57 +313,61 @@
                 <div class="card-header d-flex p-0">
                   <ul class="nav nav-pills ml-auto p-2">
                     <li class="nav-item"><a class="nav-link active" href="#tab_1" data-toggle="tab">Draw</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#tab_2" data-toggle="tab">Upload</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#tab_3" data-toggle="tab">Saved Signature</a></li>
+                    <li class="nav-item"><a id="t2" class="nav-link" href="#tab_2" data-toggle="tab">Upload</a></li>
+                    <li class="nav-item"><a id="t3" class="nav-link" href="#tab_3" data-toggle="tab">Saved Signature</a></li>
                   </ul>
                 </div><!-- /.card-header -->
                 <div class="card-body">
                   <div class="tab-content">
                     <div class="tab-pane active" id="tab_1">
-                        <div id="signature-pad" class="signature-pad">
-						<div class="signature-pad--body">
-						
-						  <canvas class="canvasbody" style="height: 400px !important;"></canvas>
-						 
-						  
-						</div>
-						<div class="signature-pad--footer">
-						  <div class="description">Sign above</div>
 
-						  <div class="signature-pad--actions">
-							<div class="row col-md-9">
-							  <button type="button" class="col-md-3 offset-md-1 btn btn-primary btn-block" style="margin:5px; margin-top:5px;" data-action="clear">Clear</button>
-							  <button type="button" class="col-md-3 offset-md-1 btn btn-primary btn-block" data-action="undo">Undo</button>
-							  <button type="button" class="col-md-3 offset-md-1 btn btn-primary btn-block" data-action="change-color">Save Signature</button>
-							  
+                      <div id="signature-pad" class="signature-pad">
+          <div class="signature-pad--body">
 
-							</div>
-							<div class="row" style="margin-top:5px;margin-bottom:5px"></div>
-							<div class="row col-md-9" >
-								<button type="button" data-jscolor="{valueElement:'hexclr',value:'pick color', hash:true}" class="col-md-3  btn btn-primary btn-block" style="margin-left:6px;">Pick color</button>
-								<b class="col-md-3 offset-md-1"> Choosen color:<input id="hexclr"  name="hexclr" size="6" type="text"/></b>
-								<button class="col-md-3 offset-md-1 btn btn-primary btn-block" onclick="setcolor(document.getElementById('hexclr').value)"  type="button" style="margin-left:77px;">Select color</button>
-							</div>
-							
-							<div class="row" style="margin-top:5px;margin-bottom:5px"></div>
-							
-							<div class="row col-md-9">
-							  <button type="button" class="col-md-3  btn btn-primary btn-block" data-action="save-png" style="margin:5px; margin-top:4px;">Download as PNG</button>
-							  <button type="button" class="col-md-3  offset-md-1 btn btn-primary btn-block" data-action="save-jpg">Download as JPG</button>
-							  <button type="button" class="col-md-3  offset-md-1 btn btn-primary btn-block" data-action="save-svg">Download as SVG</button>
-							</div>
-						  </div>
-						</div>
-					</div>
+            <canvas class="canvasbody" style="height: 400px !important;"></canvas>
+
+
+          </div>
+          <div class="signature-pad--footer">
+            <div class="description">Sign above</div>
+
+
+            <div class="signature-pad--actions">
+          <div class="row col-md-9">
+            <button type="button" class="col-md-3 offset-md-1 btn btn-primary btn-block" style="margin:5px; margin-top:5px;" data-action="clear">Clear</button>
+            <button type="button" class="col-md-3 offset-md-1 btn btn-primary btn-block" data-action="undo">Undo</button>
+            <button type="button" class="col-md-3 offset-md-1 btn btn-primary btn-block" data-action="change-color">Save Signature</button>
+
+          </div>
+       							<div class="row" style="margin-top:5px;margin-bottom:5px"></div>
+       							<div class="row col-md-9" >
+       								<button type="button" data-jscolor="{valueElement:'hexclr',value:'pick color', hash:true}" class="col-md-3  btn btn-primary btn-block" style="margin-left:6px;">Pick color</button>
+       								<b class="col-md-3 offset-md-1"> Choosen color:<input id="hexclr"  name="hexclr" size="6" type="text"/></b>
+       								<button class="col-md-3 offset-md-1 btn btn-primary btn-block" onclick="setcolor(document.getElementById('hexclr').value)"  type="button" style="margin-left:77px;">Select color</button>
+       							</div>
+
+       							<div class="row" style="margin-top:5px;margin-bottom:5px"></div>
+
+       							<div class="row col-md-9">
+       							  <button type="button" class="col-md-3  btn btn-primary btn-block" data-action="save-png" style="margin:5px; margin-top:4px;">Download as PNG</button>
+       							  <button type="button" class="col-md-3  offset-md-1 btn btn-primary btn-block" data-action="save-jpg">Download as JPG</button>
+       							  <button type="button" class="col-md-3  offset-md-1 btn btn-primary btn-block" data-action="save-svg">Download as SVG</button>
+       							</div>
+       						  </div>
+       						</div>
+       					</div>
+
 
                       <script src="js/signature_pad.js"></script>
                       <script src="js/app.js"></script>
                       <script src="js/jscolor.js"></script>
-					  <script>
-						function setcolor(pcolor){
-							signaturePad.penColor = pcolor;
-						}
-					  </script>
+
+                      <script>
+                      function setcolor(pcolor){
+                        signaturePad.penColor = pcolor;
+                      }
+                      </script>
+
                     </div>
                     <!-- /.tab-pane -->
                     <div class="tab-pane" id="tab_2">
@@ -175,22 +376,24 @@
           <div class="col-md-6">
             <!-- general form elements -->
             <div class="card card-primary">
-              
+
               <!-- /.card-header -->
               <!-- form start -->
-              <form role="form">
+              <form role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);
+echo "?tab=t3"
+?>" method="post" enctype="multipart/form-data">
                 <div class="card-body">
-                  
-                  
                   <div class="form-group">
-                    <label for="exampleInputFile">File input</label>
+                    <label for="fileToUpload">File input</label>
                     <div class="input-group">
                       <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="exampleInputFile">
-                        <label class="custom-file-label" for="exampleInputFile">Choose file</label>
+                        <input type="file" name="fileToUpload"  id="fileToUpload">
+                        <!--<label class="custom-file-label" for="fileToUpload">Choose file</label> -->
+                        <input type="submit" value="Upload Signature" name="submit">
                       </div>
                       <div class="input-group-append">
-                        <span class="input-group-text" id="">Upload</span>
+                        <!--<span class="input-group-text" id="">Upload</span>-->
+                        <!-- <input type="submit" value="Upload Signature" name="submit"> -->
                       </div>
                     </div>
                   </div>
@@ -198,22 +401,62 @@
                 </div>
                 <!-- /.card-body -->
 
-                
               </form>
             </div>
             <!-- /.card -->
 
-            
-
           </div>
           <!--/.col (left) -->
           <!-- right column -->
-          
+
           <!--/.col (right) -->
         </div>
                     <!-- /.tab-pane -->
                     <div class="tab-pane" id="tab_3">
-                     
+
+<table <table class="table table-hover table-bordered">
+<thead>
+<tr>
+<th>#</th>
+<th>Created</th>
+<th>Signature</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody>
+<?php while (mysqli_stmt_fetch($stmt))
+{
+    echo "<tr>";
+    echo "<td style='vertical-align:middle'>" . $counter . "</td>";
+    echo "<td style='vertical-align:middle'>" . $created . "</td>";
+    echo "<td style='vertical-align:middle'>" . "  <a class='image-link' href='data:image/png;base64,";
+    echo base64_encode($signature);
+    echo "'> <img src= 'data:image/png;base64,";
+    echo base64_encode($signature);
+    echo "'> </a>";
+    echo "</td>";
+    echo "
+<td style='vertical-align:middle'>
+
+
+  <form method='post' action='?rm_id=$id'>
+    <input class='btn btn-default' type='submit' value='Delete' > </form>
+
+
+<a download='file' href='data:image/png;base64,";
+    echo base64_encode($signature);
+    echo "' > <button class='btn btn-default'>Download </button>
+
+</td>";
+    echo "</tr>";
+    $counter++;
+}
+
+mysqli_stmt_close($stmt);
+?>
+</tbody>
+</table>
+
                     </div>
                     <!-- /.tab-pane -->
                   </div>
@@ -252,6 +495,9 @@
 <script>
   $.widget.bridge('uibutton', $.ui.button)
 </script>
+
+
+
 <!-- Bootstrap 4 -->
 <script src="plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
 <!-- ChartJS -->
