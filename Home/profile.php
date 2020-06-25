@@ -1,3 +1,133 @@
+<?php
+// Initialize the session
+session_start();
+
+// Include config file
+require_once "config.php";
+
+// Check if the user is logged in, if not then redirect them to login page
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true)
+{
+    header("location: login.php");
+    exit;
+}
+// Define variables
+$created = $firstname = $lastname = $email = $role = $password = "";
+$employee = $company = "";
+$firstname_err = $lastname_err = $email_err = $role_err = $password_err = "";
+$employee_err = $company_err = "";
+
+// Processing form data when form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST")
+{
+
+    if (empty(trim($_POST["firstname"])))
+    {
+
+        $firstname_err = "Please enter your first name.";
+    }
+    else
+    {
+        $firstname = trim($_POST["firstname"]);
+    }
+    // validate lastname
+    if (empty(trim($_POST["lastname"])))
+    {
+        $lastname_err = "Please enter your last name.";
+    }
+    else
+    {
+        $lastname = trim($_POST["lastname"]);
+    }
+    // validate company
+    if (empty(trim($_POST["role"])))
+    {
+        $role_err = "Please enter your role";
+    }
+    else
+    {
+        $role = trim($_POST["role"]);
+    }
+
+    // validate company
+    if (empty(trim($_POST["company"])))
+    {
+        $company_err = "Please enter the name of the company.";
+    }
+    else
+    {
+        $company = trim($_POST["company"]);
+    }
+
+    if (empty($firstname_err) && empty($lastname_err) && empty($role_err) && empty($company_err))
+    {
+        $sql = "UPDATE users SET firstname = '$firstname',lastname='$lastname',company = '$company',role='$role' WHERE id = ?";
+        if ($stmt = mysqli_prepare($link, $sql))
+        {
+            mysqli_stmt_bind_param($stmt, "i", $param_user_id);
+            $param_user_id = $_SESSION["id"];
+            if (mysqli_stmt_execute($stmt))
+            {
+                //close the statement
+                mysqli_stmt_close($stmt);
+            }
+            else
+            {
+                echo "Executing SQL statement failed. Please try again later.";
+            }
+        }
+        else
+        {
+            echo "ooops! Something went wrong. Please try again later2.";
+        }
+
+    }
+}
+
+$sql = "SELECT created,firstname,lastname,role,company,email FROM users WHERE id = ?";
+if ($stmt = mysqli_prepare($link, $sql))
+{
+    mysqli_stmt_bind_param($stmt, "i", $param_user_id);
+    $param_user_id = $_SESSION["id"];
+    if (mysqli_stmt_execute($stmt))
+    {
+        mysqli_stmt_store_result($stmt);
+        if (mysqli_stmt_num_rows($stmt) == 1)
+        {
+            if (mysqli_stmt_bind_result($stmt, $created, $firstname, $lastname, $role, $company, $email))
+            {
+                if (mysqli_stmt_fetch($stmt))
+                {
+                    //echo "all good.";
+
+                }
+                else
+                {
+                    echo "Failed fetching the values. Please try again later.";
+                }
+            }
+            else
+            {
+                echo "Failed binding the results";
+            }
+        }
+        else
+        {
+            echo "No account has found.";
+        }
+        //close the statement
+        mysqli_stmt_close($stmt);
+    }
+}
+else
+{
+    echo "failed at preparing the SQL statement.";
+}
+
+// Close connection
+mysqli_close($link);
+
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -35,7 +165,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
   <!--<link rel="stylesheet" href="css/signature-pad.css">-->
-  
+
   <style type="text/css">
 
     .canvasbody {
@@ -173,77 +303,68 @@
   </script>
 
 
-</head>
-      <?php include 'sidebar.php'; ?>
+  </head>
+  <body>
+
+    <?php include 'sidebar.php'; ?>
     </aside>
 
-    <!-- Content Wrapper. Contains page content -->
     <div class="container emp-profile d-flex justify-content-center">
             <!-- edit form column -->
             <div class="col-md-8 col-sm-6 col-xs-12 personal-info">
-            
-            <h3 class="d-flex justify-content-center">Personal info</h3>
+
+            <h3 class="d-flex justify-content-center">Personal Information</h3>
             <br><br>
-            <form class="form-horizontal" role="form">
+            <form class="form-horizontal" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                 <div class="form-group row">
                 <label class="col-lg-3 control-label ">First name:</label>
                 <div class="col-lg-8">
-                    <input class="form-control edit-profile" value="Jane" type="text" disabled>
+                    <input  class="form-control edit-profile" style="text-transform: capitalize;" value="<?php echo $firstname; ?>" name="firstname" type="text" disabled>
+                    <span class="help-block"><?php echo $firstname_err; ?></span>
                 </div>
                 </div>
                 <div class="form-group row">
                 <label class="col-lg-3 control-label">Last name:</label>
                 <div class="col-lg-8">
-                    <input class="form-control edit-profile" value="Bishop" type="text" disabled>
+                    <input class="form-control edit-profile" style="text-transform: capitalize;" name = "lastname" value="<?php echo $lastname; ?>" type="text" disabled>
+                    <span class="help-block"><?php echo $lastname_err; ?></span>
                 </div>
                 </div>
+
                 <div class="form-group row">
-                <label class="col-lg-3 control-label">Nick name:</label>
+                <label class="col-lg-3 control-label">Account created:</label>
                 <div class="col-lg-8">
-                    <input class="form-control edit-profile" value="Henrry" type="text" disabled>
+                    <input class="form-control" value="<?php echo $created; ?>" type="text" disabled>
                 </div>
                 </div>
+
                 <div class="form-group row">
                 <label class="col-lg-3 control-label">Company:</label>
                 <div class="col-lg-8">
-                    <input class="form-control edit-profile" value="" type="text" disabled>
+                    <input class="form-control edit-profile" style="text-transform: capitalize;" value="<?php echo $company; ?>" name ="company" type="text" disabled>
+                    <span class="help-block"><?php echo $company_err; ?></span>
                 </div>
                 </div>
+                <div class="form-group row">
+                <label class="col-lg-3 control-label">Role:</label>
+                <div class="col-lg-8">
+                    <input class="form-control edit-profile" style="text-transform: capitalize;" value="<?php echo $role; ?>" name ="role" type="text" disabled>
+                    <span class="help-block"><?php echo $role_err; ?></span>
+                </div>
+                </div>
+
                 <div class="form-group row">
                 <label class="col-lg-3 control-label">Email:</label>
                 <div class="col-lg-8">
-                    <input class="form-control" value="janesemail@gmail.com" type="text" disabled>
+                    <input class="form-control" value="<?php echo $email; ?>" type="text" disabled>
                 </div>
                 </div>
-                <div class="form-group row">
-                <label class="col-lg-3 control-label ">Time Zone:</label>
-                <div class="col-lg-8">
-                    <div class="ui-select">
-                    <select id="user_time_zone" class="form-control edit-profile" disabled>
-                        <option value="Hawaii">(GMT-10:00) Hawaii</option>
-                        <option value="Alaska">(GMT-09:00) Alaska</option>
-                        <option value="Pacific Time (US & Canada)">(GMT-08:00) Pacific Time (US & Canada)</option>
-                        <option value="Arizona">(GMT-07:00) Arizona</option>
-                        <option value="Mountain Time (US & Canada)">(GMT-07:00) Mountain Time (US & Canada)</option>
-                        <option value="Central Time (US & Canada)" selected="selected">(GMT-06:00) Central Time (US & Canada)</option>
-                        <option value="Eastern Time (US & Canada)">(GMT-05:00) Eastern Time (US & Canada)</option>
-                        <option value="Indiana (East)">(GMT-05:00) Indiana (East)</option>
-                    </select> 
-                    </div>
-                </div>
-                </div>
-                <div class="form-group row">
-                <label class="col-md-3 control-label">Username:</label>
-                <div class="col-md-8">
-                    <input class="form-control edit-profile" value="janeuser" type="text" disabled>
-                </div>
-                </div>
-                
+
                 <div class="form-group row">
                 <label class="col-md-3 control-label"></label>
                 <div class="col-md-8">
-                    <input class="btn btn-primary" value="Save Changes" type="button" id="save" style="display:none">
-                    
+                    <input class="btn btn-primary" value="Save Changes" type="submit" id="save" style="display:none">
+
                     <span></span>
                     <input class="btn btn-primary" value="Edit Profile" type="button" id="edit" onclick="editprofile()">
                     <span></span>
@@ -312,7 +433,7 @@
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 
-<script> 
+<script>
     function editprofile() {
     $("#edit").hide();
     $('.edit-profile').removeAttr("disabled");
@@ -337,7 +458,7 @@ $( "#cancel" ).click(function() {
   $("#edit").show();
     $('.edit-profile').attr("disabled", true);
 
-    
+
 });
 
 
@@ -345,14 +466,15 @@ $( "#save" ).click(function() {
     $("#save").hide();
     $("#cancel").hide();
   $("#edit").show();
-    $('.edit-profile').attr("disabled", true);
-
-    swal({
+    //$('.edit-profile').attr("disabled", true);
+/*
+    /swal({
   title: "Profile Updated Successfully!",
   icon: "success",
 });
+*/
 
-    
+
 });
 
 </script>
