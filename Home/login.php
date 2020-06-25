@@ -197,6 +197,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 
     <!-- Main JS-->
     <script src="js/global.js"></script>
-
 </body>
 </html>
