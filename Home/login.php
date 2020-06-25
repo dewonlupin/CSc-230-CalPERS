@@ -2,86 +2,119 @@
 // Initialize the session
 session_start();
 
-// Check if the user is already logged in, if yes then redirect him to welcome page
-if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
-    header("location: Signature.php");
+// Checks if the user is already logged in, if yes then redirect them to profile page
+if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true)
+{
+    header("location: profile.php");
     exit;
 }
 
 // Include config file
 require_once "config.php";
 
-// Define variables and initialize with empty values
 $email = $password = "";
 $email_err = $password_err = "";
 
 // Processing form data when form is submitted
-if($_SERVER["REQUEST_METHOD"] == "POST"){
-
-    // Check if username is empty
-    if(empty(trim($_POST["username"]))){
+if ($_SERVER["REQUEST_METHOD"] == "POST")
+{
+    // Validate email
+    if (empty(trim($_POST["username"])))
+    {
         $email_err = "Please enter username.";
-    } else{
+    }
+    else
+    {
         $email = trim($_POST["username"]);
     }
 
-    // Check if password is empty
-    if(empty(trim($_POST["password"]))){
+    // Validate password
+    if (empty(trim($_POST["password"])))
+    {
         $password_err = "Please enter your password.";
-    } else{
+    }
+    else
+    {
         $password = trim($_POST["password"]);
     }
 
     // Validate credentials
-    if(empty($email_err) && empty($password_err)){
-        // Prepare a select statement
-        $sql = "SELECT id,firstname ,email, password FROM users WHERE email = ?";
+    if (empty($email_err) && empty($password_err))
+    {
+        $sql = "SELECT id,firstname,lastname,email,company,role,password,verified FROM users WHERE email = ?";
 
-        if($stmt = mysqli_prepare($link, $sql)){
-            // Bind variables to the prepared statement as parameters
+        // Prepares the statement
+        if ($stmt = mysqli_prepare($link, $sql))
+        {
+            // Binds variables
             mysqli_stmt_bind_param($stmt, "s", $param_email);
 
-            // Set parameters
+            // Set parameter
             $param_email = $email;
 
             // Attempt to execute the prepared statement
-            if(mysqli_stmt_execute($stmt)){
+            if (mysqli_stmt_execute($stmt))
+            {
                 // Store result
                 mysqli_stmt_store_result($stmt);
 
-                // Check if username exists, if yes then verify password
-                if(mysqli_stmt_num_rows($stmt) == 1){
+                // Check if username exists
+                if (mysqli_stmt_num_rows($stmt) == 1)
+                {
                     // Bind result variables
-                    mysqli_stmt_bind_result($stmt, $id,$firstname, $email, $hashed_password);
-                    if(mysqli_stmt_fetch($stmt)){
-                        if(password_verify($password, $hashed_password)){
-                            // Password is correct, so start a new session
-                            session_start();
+                    mysqli_stmt_bind_result($stmt, $id, $firstname, $lastname, $email, $company, $role, $hashed_password, $vefified);
+                    if (mysqli_stmt_fetch($stmt))
+                    {
+                        if ($vefified)
+                        {
+                            if (password_verify($password, $hashed_password))
+                            {
+                                // Password is correct, so start a new session
+                                if (!isset($_SESSION))
+                                {
+                                    session_start();
+                                }
 
-                            // Store data in session variables
-                            $_SESSION["loggedin"] = true;
-                            $_SESSION["id"] = $id;
-                            $_SESSION["user"] = $firstname;
+                                // Store data in session variables
+                                $_SESSION["loggedin"] = true;
+                                $_SESSION["id"] = $id;
 
-                            // Redirect user to welcome page
-                            header("location: Signature.php");
-                        } else{
-                            // Display an error message if password is not valid
-                            $password_err = "The password you entered was not valid.";
+                                // Redirects user to profile page
+                                header("location: profile.php");
+                            }
+                            else
+                            {
+                                // Display an error message if password is not valid
+                                $password_err = "The password you entered was not correct.";
+                            }
+                        }
+                        else
+                        {
+                            $alert = "We have already sent you a verification email. Please verify your account to log in.";
+                            echo "<script type='text/javascript'>alert('$alert');</script>";
                         }
                     }
-                } else{
-                    // Display an error message if username doesn't exist
-                    $email_err = "No account found with that username.";
+                    else {
+                      echo "Results were not fetched properly.";
+                    }
                 }
-            } else{
-                echo "Oops! Something went wrong. Please try again later.";
+                else
+                {
+                    $email_err = "No account found. Please sign up.";
+                }
+            }
+            else
+            {
+                echo "SQL failed executing the statement. Please try again later.";
             }
             // Close statement
             mysqli_stmt_close($stmt);
         }
+        else
+        {
+          echo "Preparing SQL statement failed. Please try again later.";
+        }
     }
-
     // Close connection
     mysqli_close($link);
 }
@@ -90,6 +123,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <!DOCTYPE html>
 <html lang="en">
 <head>
+      <title>Login</title>
     <!-- Required meta tags-->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -98,7 +132,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <meta name="keywords" content="Colorlib Templates">
 
     <!-- Title Page-->
-    <title>Software Chasers</title>
+    <title><img src="images/Calpers-logo.png" />login</title>
 
     <!-- Icons font CSS-->
     <link href="vendor/mdi-font/css/material-design-iconic-font.min.css" rel="stylesheet" media="all">
@@ -114,7 +148,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <link href="build/css/main.css" rel="stylesheet" media="all">
 <style type="text/css">
 .wrapper--w680 {
-    max-width: 500px !important;
+ max-width: 500px !important;
 }
 </style>
 </head>
@@ -123,33 +157,31 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         <div class="wrapper wrapper--w680">
             <div class="card card-4">
                 <div class="card-body">
-
                     <h2 class="title">Sign In</h2>
                      <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                         <div class="row row-space">
                             <div class="col-2">
-                                <div class="input-container">
-                                   
-				<i class="fa fa-user icon"></i>
-                                    <input class="input-field input--style-4" type="text"  name="username" placeholder="User Name"  value="<?php echo $email; ?>">
+                              <div class="input-container">
+                                <i class="fa fa-user icon"></i>
+                                <input class="input-field input--style-4" type="text"  name="username" placeholder="User Name"  value="<?php echo $email; ?>">
+                                    <p><span class="help-block"><?php echo $email_err; ?></span></p>
                                 </div>
                             </div>
-                            
+
                         </div>
                         <div class="row">
                             <div class="col-2">
-                                <div class="input-container">
-                                    <i class="fa fa-key icon"></i>
-                                    <input class="input-field input--style-4"  type="password" name="password" placeholder="Password">
-                                    
+                              <div class="input-container">
+                                <i class="fa fa-key icon"></i>
+                                <input class="input-field input--style-4"  type="password" name="password" placeholder="Password">
                                 </div>
-<span class="help-block"><?php echo $password_err; ?></span>
+                                <span class="help-block"><?php echo $password_err; ?></span>
                             </div>
                         </div>
                         <div class="p-t-15">
                       		<input type="submit" class="btn btn-primary" value="Log In">
                         </div>
-			<div class="row"><p style="padding-top: 15px;padding-left: 52px;">Don't have an account? <a href="register.php">Sign up here</a>.</p></div>
+                        <div class="row"><p style="padding-top: 15px;padding-left: 52px;">Don't have an account? <a href="register.php">Sign up here</a>.</p></div>
                     </form>
                 </div>
             </div>
