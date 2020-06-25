@@ -12,26 +12,26 @@
             </ul>
             <ul class="navbar-nav">
                 <li class="nav-item">
-                        <a href="logout.php" class="btn btn-danger">Sign Out of Your Account</a>      
+                        <a href="logout.php" class="btn btn-danger">Sign Out of Your Account</a>
                 </li>
-               
+
             </ul>
         </div>
-         
+
 </div>
 
 
-      <!-- <a href="logout.php" class="btn btn-danger">Sign Out of Your Account</a> -->
+      <!-- <a href="../logout.php" class="btn btn-danger">Sign Out of Your Account</a> -->
 
       <!-- Right navbar links -->
-      
+
     </nav>
     <!-- /.navbar -->
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4" style="background-color:#3c8dbc;">
       <!-- Brand Logo -->
-      <a href="index.html" class="brand-link" style="background-color:#276a91; padding-left:20px;">
-        
+      <a href="profile.php" class="brand-link" style="background-color:#276a91; padding-left:20px;">
+
         <span class="brand-text font-weight-light">Software Chasers</span>
       </a>
  <!-- Sidebar -->
@@ -66,7 +66,7 @@
               <a href="reset-password.php" class="nav-link">
                 <i class="nav-icon fa fa-key"></i>
                 <p>
-                  Reset Password
+                  Security
                 </p>
               </a>
             </li>
