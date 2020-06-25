@@ -1,147 +1,195 @@
 <?php
+
 // Include config file
 require_once "config.php";
-// Define variables and initialize with empty values
-$firstname = $lastname = $email = $password = "";
-$confirm_password = $employee = $calpers_id = $company =  "";
-$firstname_err = $lastname_err = $email_err = $password_err = "";
-$confirm_password_err = $employee_err = $calpers_id_err = $company_err = "";
+
+$firstname = $lastname = $email = $role = $password = "";
+$confirm_password = $employee = $company = "";
+$firstname_err = $lastname_err = $email_err = $role_err = $password_err = "";
+$confirm_password_err = $employee_err = $company_err = "";
 
 // Processing form data when form is submitted
-if($_SERVER["REQUEST_METHOD"] == "POST"){
+if ($_SERVER["REQUEST_METHOD"] == "POST")
+{
+    //validate employee status
+    if (!isset($_POST["employee"]))
+    {
+        $employee_err = "Please select one.";
+    }
+    else
+    {
+        $employee = trim($_POST["employee"]);
+    }
+
     // Validate email
-    if(empty(trim($_POST["email"]))){
+    if (empty(trim($_POST["email"])))
+    {
         $email_err = "Please enter an Email address.";
     }
-    else{
-        // Prepare a select statement
+    else
+    {
         $sql = "SELECT id FROM users WHERE email = ?";
-        if($stmt = mysqli_prepare($link, $sql)){
+        // Prepare a select statement
+        if ($stmt = mysqli_prepare($link, $sql))
+        {
             // Bind variables to the prepared statement as parameters
             mysqli_stmt_bind_param($stmt, "s", $param_email);
             // Set parameters
             $param_email = trim($_POST["email"]);
             // Attempt to execute the prepared statement
-            if(mysqli_stmt_execute($stmt)){
-                /* store result */
+            if (mysqli_stmt_execute($stmt))
+            {
                 mysqli_stmt_store_result($stmt);
 
-                if(mysqli_stmt_num_rows($stmt) == 1){
+                if (mysqli_stmt_num_rows($stmt) == 1)
+                {
                     $email_err = "This email has already been registered.";
                 }
-                else{
+                else
+                {
                     $email = trim($_POST["email"]);
                 }
             }
-            else{
-                echo "Oops! Something went wrong. Please try again later.";
+            else
+            {
+                echo "Executing the SQL statement failed. Please try again later.";
             }
 
             // Close statement
             mysqli_stmt_close($stmt);
+            if ($employee == "yes" && !(preg_match('/@calpers.ca.gov$/', $email)))
+            {
+                $email_err = "This is not a valid CalPERS account.";
+            }
+        }
+        else {
+          echo "Failed at preparing the SQL statement.";
         }
     }
     // validate firstname
-    if(empty(trim($_POST["firstname"]))){
-        $firstname_err = "Please enter a first name.";
+    if (empty(trim($_POST["firstname"])))
+    {
+        $firstname_err = "Please enter your first name.";
     }
-    else{
+    else
+    {
         $firstname = trim($_POST["firstname"]);
     }
     // validate lastname
-    if(empty(trim($_POST["lastname"]))){
-        $lastname_err = "Please enter a last name.";
+    if (empty(trim($_POST["lastname"])))
+    {
+        $lastname_err = "Please enter your last name.";
     }
-    else{
+    else
+    {
         $lastname = trim($_POST["lastname"]);
     }
-    //validate employee status
-    if (!isset($_POST["employee"])){
-      $employee_err = "Please select one.";
+    // validate role
+    if (empty(trim($_POST["role"])))
+    {
+        $role_err = "Please enter your role";
     }
-    else{
-        $employee = trim($_POST["employee"]);
-    }
-    if(empty(trim($_POST["calpers_id"]))){
-        $calpers_id_err = "Please enter your CalPERS ID.";
-    }
-    else{
-        $calpers_id = trim($_POST["calpers_id"]);
+    else
+    {
+        $role = trim($_POST["role"]);
     }
 
     // validate company
-    if(empty(trim($_POST["company"]))){
-        $company_err = "Please enter the name of company.";
+    if (empty(trim($_POST["company"])))
+    {
+        $company_err = "Please enter the name of the company.";
     }
-    else{
+    else
+    {
         $company = trim($_POST["company"]);
     }
-    if ($employee=="yes"){
-      $company_err=$company="";
-
-    }elseif ($employee=="no") {
-      $calpers_id_err=$calpers_id="";
-      $role_err=$role="";
+    if ($employee == "yes")
+    {
+        $company_err = $company = "";
+        $role_err = $role = "";
     }
-
     // Validate password
-    if(empty(trim($_POST["password"]))){
+    if (empty(trim($_POST["password"])))
+    {
         $password_err = "Please enter a password.";
-    } elseif(strlen(trim($_POST["password"])) < 6){
-        $password_err = "Password must have atleast 6 characters.";
-    } else{
+    }
+    elseif (strlen(trim($_POST["password"])) < 8)
+    {
+        $password_err = "Password must have at least eight characters.";
+    }
+    elseif (!preg_match('@[A-Z]@', trim($_POST["password"])))
+    {
+        $password_err = "Password must have at least one uppercase letter";
+    }
+    elseif (!preg_match('@[a-z]@', trim($_POST["password"])))
+    {
+        $password_err = "Password must have at least one lowercase letter";
+
+    }
+    elseif (!preg_match('@[0-9]@', trim($_POST["password"])))
+    {
+        $password_err = "Password must have at least one number digit";
+
+    }
+    elseif (!preg_match('@[^\w]@', trim($_POST["password"])))
+    {
+        $password_err = "Password must have at least one special character";
+    }
+    else
+    {
         $password = trim($_POST["password"]);
     }
 
     // Validate confirm password
-    if(empty(trim($_POST["confirm_password"]))){
+    if (empty(trim($_POST["confirm_password"])))
+    {
         $confirm_password_err = "Please confirm password.";
-    } else{
+    }
+    else
+    {
         $confirm_password = trim($_POST["confirm_password"]);
-        if(empty($password_err) && ($password != $confirm_password)){
+        if (empty($password_err) && ($password != $confirm_password))
+        {
             $confirm_password_err = "Password did not match.";
         }
     }
 
     // Check input errors before inserting in database
-    if( empty($firstname_err) && empty($lastname_err)&& empty($employee_err) &&
-    empty($calpers_id_err)&& empty($company_err)&&
-    empty($email_err) && empty($password_err) && empty($confirm_password_err) ){
-
-        // Prepare an insert statement
-        $sql = "INSERT INTO users (firstname,lastname,role,calpersid,company,email, password,token) VALUES (?,?,?,?,?,?,?,?)";
-        $token = md5(time().$email);
-        if($stmt = mysqli_prepare($link, $sql)){
+    if (empty($firstname_err) && empty($lastname_err) && empty($employee_err) && empty($role_err) && empty($company_err) && empty($email_err) && empty($password_err) && empty($confirm_password_err))
+    {
+        $sql = "INSERT INTO users (firstname,lastname,role,company,email, password,token) VALUES (?,?,?,?,?,?,?)";
+        // Prepares SQL statement
+        $token = password_hash($email . time() , PASSWORD_DEFAULT);
+        if ($stmt = mysqli_prepare($link, $sql))
+        {
             // Bind variables to the prepared statement as parameters
-            mysqli_stmt_bind_param($stmt, "ssssssss", $param_firstname,$param_lastname,
-            $param_role, $param_calpers_id,$param_company,$param_email, $param_password,$param_token);
+            mysqli_stmt_bind_param($stmt, "sssssss", $param_firstname, $param_lastname, $param_role, $param_company, $param_email, $param_password, $param_token);
 
             // Set parameters
-            $param_firstname=$firstname;
-            $param_lastname=$lastname;
-            if ($employee=="yes")
+            $param_firstname = $firstname;
+            $param_lastname = $lastname;
+            if ($employee == "yes")
             {
-              $param_role="TBD";
-              $param_company="CalPERS";
-              $param_calpers_id=(int)$calpers_id;
+                $param_role = "Staff";
+                $param_company = "CalPERS";
             }
-            elseif ($employee=="no") {
-              $param_company=$company;
-              $param_role="TBD";
-              $param_calpers_id=-1;
+            elseif ($employee == "no")
+            {
+                $param_company = $company;
+                $param_role = $role;
             }
             $param_token = $token;
             $param_email = $email;
             $param_password = password_hash($password, PASSWORD_DEFAULT); // Creates a password hash
-
             // Attempt to execute the prepared statement
-
-            if(mysqli_stmt_execute($stmt)){
+            if (mysqli_stmt_execute($stmt))
+            {
                 // Redirect to login page
-                header("location:welcome.php");
-
-            } else{
-                echo "Something went wrong. Please try again later.";
+                header("Refresh:0; url=./login.php");
+            }
+            else
+            {
+                echo "Failed executing the SQL statement. Please try again later.";
             }
             // Close statement
             mysqli_stmt_close($stmt);
@@ -162,7 +210,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             document.getElementById('calpers_block').style.display = 'none';
             document.getElementById('outsider_block').style.display = 'block';
         }
-
 }
 </script>
 
@@ -178,7 +225,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <meta name="keywords" content="Colorlib Templates">
 
     <!-- Title Page-->
-    <title>Software Chasers</title>
+    <title>Sign Up</title>
 
     <!-- Icons font CSS-->
     <link href="vendor/mdi-font/css/material-design-iconic-font.min.css" rel="stylesheet" media="all">
@@ -199,9 +246,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         <div class="wrapper wrapper--w680">
             <div class="card card-4">
                 <div class="card-body">
-			
-                    <h2 class="title">Sign Up</h2>
-                    <p style="margin-bottom: 10px;margin-top: -15px;">Please fill the form below to create an account.</p>
+                    <h2 class="title">Sign Up</h2
+                      <p style="margin-bottom: 10px;margin-top: -15px;">Please fill the form below to create an account.</p>
                     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                         <div class="row row-space">
                             <div class="col-2">
@@ -226,15 +272,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             <div class="col-2">
                                 <div class="input-group">
                                     Are you currently employed by CalPERS?
-
                                     <label class="radio-container">
                                         Yes
-                                        <input type="radio" onchange="javascript:is_calpers_employee();" name="employee" id="employee_true" value="yes" <?php if (isset($_POST['employee']) && $_POST['employee']=="yes") echo "checked";?>   >
+                                        <input type="radio" onchange="javascript:is_calpers_employee();" name="employee" id="employee_true" value="yes" <?php if (isset($_POST['employee']) && $_POST['employee'] == "yes") echo "checked"; ?>   >
                                         <span class="checkmark"></span>
                                     </label>
                                     <label class="radio-container">
                                         No
-                                        <input type="radio" onchange="javascript:is_calpers_employee();" name="employee" id="employee_false" value="no" <?php if (isset($_POST['employee']) && $_POST['employee']=="no") echo "checked";?>   >
+                                        <input type="radio" onchange="javascript:is_calpers_employee();" name="employee" id="employee_false" value="no" <?php if (isset($_POST['employee']) && $_POST['employee'] == "no") echo "checked"; ?>   >
                                         <span class="checkmark"></span>
                                     </label>
                                     <br/>
@@ -244,18 +289,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             <div class="col-2">
 
                                 <div id="calpers_block" style="display:none">
-
-                                    <div class="input-group <?php echo (!empty($calpers_id_err)) ? 'has-error' : ''; ?>">
-                                        <label>CalPERS ID# </label>
-                                        <input type="text" name="calpers_id" class="input--style-4" value="<?php echo $calpers_id; ?>">
-                                        <span class="help-block"><?php echo $calpers_id_err; ?></span>
-                                    </div>
                                 </div>
                                 <div id="outsider_block" style="display:none">
                                     <div class="input-group <?php echo (!empty($company_err)) ? 'has-error' : ''; ?>">
                                         <label>Company</label>
                                         <input type="text" name="company" class="input--style-4" value="<?php echo $company; ?>">
                                         <span class="help-block"><?php echo $company_err; ?></span>
+                                    </div>
+                                    <div class="input-group <?php echo (!empty($role_err)) ? 'has-error' : ''; ?>">
+                                        <label>Role </label>
+                                        <input type="text" name="role" class="input--style-4" value="<?php echo $role; ?>">
+                                        <span class="help-block"><?php echo $role_err; ?></span>
                                     </div>
                                 </div>
                             </div>
@@ -291,10 +335,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
                         <div class="p-t-15" style="text-align:center;">
 
-                            <input type="submit" style="width:30%" class="btn btn-primary" value="Sign Up">
-                            <input type="reset" style="width:30%" class="btn btn-primary" value="Reset">
+                          <input type="submit" style="width:30%" class="btn btn-primary" value="Sign Up">
+                          <input type="reset" style="width:30%" class="btn btn-primary" value="Reset">
                         </div>
-			<div class="row"> <p style="padding-top: 15px;padding-left: 134px;">Already have an account? <a href="login.php">Sign In here</a>.</p></div>
+                        <div class="row"> <p style="padding-top: 15px;padding-left: 134px;">Already have an account? <a href="login.php">Sign In here</a>.</p></div>
                     </form>
                 </div>
             </div>
