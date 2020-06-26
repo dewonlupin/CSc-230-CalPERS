@@ -16,7 +16,7 @@ $signature = "";
 $stmt = "";
 $counter = 1;
 $tab_value = "";
-//$image = "";
+$image = "";
 
 if (isset($_GET["tab"]))
 {
@@ -37,11 +37,14 @@ if (isset($_POST["submit"]))
         $ext = $info['extension'];
         $target = "uploaded_file." . $ext;
         move_uploaded_file($_FILES['fileToUpload']['tmp_name'], $target);
-        if (exec("python signature_processing.py -i ".$target)){
+        if (exec("./signature_processing.py -i " . $target))
+        {
+            //
+
         }
         else
         {
-            //echo "python did not execute correctly";
+            echo "python did not execute correctly";
         }
 
         if (file_get_contents('Prep_img.jpg'))
@@ -111,10 +114,12 @@ if (isset($_GET['rm_id']))
 
                     if (mysqli_stmt_execute($stmt))
                     {
+                        //
 
                     }
                     else
                     {
+                        //
 
                     }
                 }
@@ -137,7 +142,7 @@ if (isset($_GET['rm_id']))
     }
     else
     {
-        echo " failed at preparing the statement.";
+        echo "failed at preparing the statement.";
     }
 
 }
@@ -314,7 +319,7 @@ mysqli_close($link);
                   <ul class="nav nav-pills ml-auto p-2">
                     <li class="nav-item"><a class="nav-link active" href="#tab_1" data-toggle="tab">Draw</a></li>
                     <li class="nav-item"><a id="t2" class="nav-link" href="#tab_2" data-toggle="tab">Upload</a></li>
-                    <li class="nav-item"><a id="t3" class="nav-link" href="#tab_3" data-toggle="tab">Saved Signature</a></li>
+                    <li class="nav-item"><a id="t3" class="nav-link" href="#tab_3" data-toggle="tab">Saved Signatures</a></li>
                   </ul>
                 </div><!-- /.card-header -->
                 <div class="card-body">
@@ -342,7 +347,7 @@ mysqli_close($link);
        							<div class="row" style="margin-top:5px;margin-bottom:5px"></div>
        							<div class="row col-md-9" >
        								<button type="button" data-jscolor="{valueElement:'hexclr',value:'pick color', hash:true}" class="col-md-3  btn btn-primary btn-block" style="margin-left:6px;">Pick color</button>
-       								<b class="col-md-3 offset-md-1"> Choosen color:<input id="hexclr"  name="hexclr" size="6" type="text"/></b>
+       								<b class="col-md-3 offset-md-1"> Chosen color:<input id="hexclr"  name="hexclr" size="6" type="text"/></b>
        								<button class="col-md-3 offset-md-1 btn btn-primary btn-block" onclick="setcolor(document.getElementById('hexclr').value)"  type="button" style="margin-left:77px;">Select color</button>
        							</div>
 
@@ -414,7 +419,7 @@ echo "?tab=t3"
                     <!-- /.tab-pane -->
                     <div class="tab-pane" id="tab_3">
 
-<table <table class="table table-hover table-bordered">
+<table <table class="table table-bordered">
 <thead>
 <tr>
 <th>#</th>
