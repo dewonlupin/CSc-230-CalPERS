@@ -88,12 +88,13 @@ if (isset($_GET['rm_id']))
     // setting tab value to third tab, so after deleting the signure user still stays on saved signature tab.
     $tab_value = "t3";
     //preparing sql statement
-    $sql = "SELECT id FROM signatures WHERE id = ?";
+    $sql = "SELECT id FROM signatures WHERE id = ? and user_id=?";
     if ($stmt = mysqli_prepare($link, $sql))
     {
-        mysqli_stmt_bind_param($stmt, "i", $param_rm);
+        mysqli_stmt_bind_param($stmt, "ii", $param_rm,$param_rm_user);
         // Set parameters
         $param_rm = $_GET['rm_id'];
+        $param_rm_user = $_SESSION["id"];
         if (mysqli_stmt_execute($stmt))
         {
             // Store result

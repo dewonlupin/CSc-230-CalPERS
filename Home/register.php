@@ -3,10 +3,10 @@
 // Include config file
 require_once "config.php";
 
-$firstname = $lastname = $email = $role = $password = "";
-$confirm_password = $employee = $company = "";
-$firstname_err = $lastname_err = $email_err = $role_err = $password_err = "";
-$confirm_password_err = $employee_err = $company_err = "";
+$firstname = $lastname = $email = $password = "";
+$confirm_password = $employee = "";
+$firstname_err = $lastname_err = $password_err = "";
+$confirm_password_err = $employee_err = $email_err = "";
 
 // Processing form data when form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST")
@@ -47,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
                 }
                 else
                 {
-                    $email = trim($_POST["email"]);
+                    $email = strtolower(trim($_POST["email"]));
                 }
             }
             else
@@ -73,7 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
     }
     else
     {
-        $firstname = trim($_POST["firstname"]);
+        $firstname = ucfirst(trim($_POST["firstname"]));
     }
     // validate lastname
     if (empty(trim($_POST["lastname"])))
@@ -82,31 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
     }
     else
     {
-        $lastname = trim($_POST["lastname"]);
-    }
-    // validate role
-    if (empty(trim($_POST["role"])))
-    {
-        $role_err = "Please enter your role";
-    }
-    else
-    {
-        $role = trim($_POST["role"]);
-    }
-
-    // validate company
-    if (empty(trim($_POST["company"])))
-    {
-        $company_err = "Please enter the name of the company.";
-    }
-    else
-    {
-        $company = trim($_POST["company"]);
-    }
-    if ($employee == "yes")
-    {
-        $company_err = $company = "";
-        $role_err = $role = "";
+        $lastname = ucfirst(trim($_POST["lastname"]));
     }
     // Validate password
     if (empty(trim($_POST["password"])))
@@ -155,29 +131,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
     }
 
     // Check input errors before inserting in database
-    if (empty($firstname_err) && empty($lastname_err) && empty($employee_err) && empty($role_err) && empty($company_err) && empty($email_err) && empty($password_err) && empty($confirm_password_err))
+    if (empty($firstname_err) && empty($lastname_err) && empty($employee_err) && empty($email_err) && empty($password_err) && empty($confirm_password_err))
     {
-        $sql = "INSERT INTO users (firstname,lastname,role,company,email, password,token) VALUES (?,?,?,?,?,?,?)";
+        $sql = "INSERT INTO users (firstname,lastname,company,email, password,token) VALUES (?,?,?,?,?,?)";
         // Prepares SQL statement
         $token = password_hash($email . time() , PASSWORD_DEFAULT);
         if ($stmt = mysqli_prepare($link, $sql))
         {
             // Bind variables to the prepared statement as parameters
-            mysqli_stmt_bind_param($stmt, "sssssss", $param_firstname, $param_lastname, $param_role, $param_company, $param_email, $param_password, $param_token);
+            mysqli_stmt_bind_param($stmt, "ssssss", $param_firstname, $param_lastname, $param_company, $param_email, $param_password, $param_token);
 
             // Set parameters
             $param_firstname = $firstname;
             $param_lastname = $lastname;
             if ($employee == "yes")
             {
-                $param_role = "Staff";
                 $param_company = "CalPERS";
             }
-            elseif ($employee == "no")
-            {
-                $param_company = $company;
-                $param_role = $role;
-            }
+
             $param_token = $token;
             $param_email = $email;
             $param_password = password_hash($password, PASSWORD_DEFAULT); // Creates a password hash
@@ -203,12 +174,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 <script type="text/javascript">
     function is_calpers_employee() {
         if (document.getElementById('employee_true').checked) {
-            document.getElementById('calpers_block').style.display = 'block';
-            document.getElementById('outsider_block').style.display = 'none';
+            document.getElementById('email_label').innerHTML  = 'CalPERS Email';
         }
         else if (document.getElementById('employee_false').checked) {
-            document.getElementById('calpers_block').style.display = 'none';
-            document.getElementById('outsider_block').style.display = 'block';
+            document.getElementById('email_label').innerHTML  = 'Email';
         }
 }
 </script>
@@ -271,7 +240,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
                         <div class="row row-space">
                             <div class="col-2">
                                 <div class="input-group">
-                                    Are you currently employed by CalPERS?
+                                    Do you have a CalPERS Email address?
                                     <label class="radio-container">
                                         Yes
                                         <input type="radio" onchange="javascript:is_calpers_employee();" name="employee" id="employee_true" value="yes" <?php if (isset($_POST['employee']) && $_POST['employee'] == "yes") echo "checked"; ?>   >
@@ -286,28 +255,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
                                     <span class="help-block"><?php echo $employee_err; ?></span>
                                 </div>
                             </div>
-                            <div class="col-2">
-
-                                <div id="calpers_block" style="display:none">
-                                </div>
-                                <div id="outsider_block" style="display:none">
-                                    <div class="input-group <?php echo (!empty($company_err)) ? 'has-error' : ''; ?>">
-                                        <label>Company</label>
-                                        <input type="text" name="company" class="input--style-4" value="<?php echo $company; ?>">
-                                        <span class="help-block"><?php echo $company_err; ?></span>
-                                    </div>
-                                    <div class="input-group <?php echo (!empty($role_err)) ? 'has-error' : ''; ?>">
-                                        <label>Role </label>
-                                        <input type="text" name="role" class="input--style-4" value="<?php echo $role; ?>">
-                                        <span class="help-block"><?php echo $role_err; ?></span>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                         <div class="row row-space">
                             <div class="col-2">
                                 <div class="input-group <?php echo (!empty($email_err)) ? 'has-error' : ''; ?>">
-                                    <label class="label">Email</label>
+                                    <label id ="email_label" class="label">Email</label>
                                     <input type="text" name="email" class="input--style-4" value="<?php echo $email; ?>">
                                     <span class="help-block"><?php echo $email_err; ?></span>
                                 </div>

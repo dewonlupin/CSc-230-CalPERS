@@ -2,10 +2,11 @@
 CREATE DATABASE IF NOT EXISTS user_database;
 USE user_database;
 
+-- Dropping users signatures
+DROP TABLE IF EXISTS `signatures`;
+
 -- Dropping users table
 DROP TABLE IF EXISTS `users`;
-
-DROP TABLE IF EXISTS `signatures`;
 
 -- Table structure for table `users`
 CREATE TABLE `users` (
@@ -13,9 +14,10 @@ CREATE TABLE `users` (
   `created` datetime NOT NULL DEFAULT current_timestamp(),
   `firstname` varchar(50) NOT NULL,
   `lastname` varchar(50) NOT NULL,
-  `role` varchar(50) NOT NULL,
-  `company` varchar(50) NOT NULL,
+  `role` varchar(50) DEFAULT NULL,
+  `company` varchar(50) DEFAULT NULL,
   `email` varchar(255) NOT NULL,
+  `phone_number` varchar(30) DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `token` varchar(255) NOT NULL,
   `verified` tinyint(1) NOT NULL DEFAULT 1

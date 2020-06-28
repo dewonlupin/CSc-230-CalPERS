@@ -13,9 +13,9 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true)
 }
 // Define variables
 $created = $firstname = $lastname = $email = $role = $password = "";
-$employee = $company = "";
+$employee = $phone_number = $company = "";
 $firstname_err = $lastname_err = $email_err = $role_err = $password_err = "";
-$employee_err = $company_err = "";
+$employee_err = $phone_number_err = $company_err = "";
 
 // Processing form data when form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST")
@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
     }
     else
     {
-        $firstname = trim($_POST["firstname"]);
+        $firstname = ucfirst(trim($_POST["firstname"]));
     }
     // validate lastname
     if (empty(trim($_POST["lastname"])))
@@ -37,12 +37,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
     }
     else
     {
-        $lastname = trim($_POST["lastname"]);
+        $lastname = ucfirst(trim($_POST["lastname"]));
     }
-    // validate company
+    // validate role
     if (empty(trim($_POST["role"])))
     {
-        $role_err = "Please enter your role";
+        //$role_err = "Please enter your role.";
     }
     else
     {
@@ -52,16 +52,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
     // validate company
     if (empty(trim($_POST["company"])))
     {
-        $company_err = "Please enter the name of the company.";
+        //$company_err = "Please enter the name of the company you work for.";
     }
     else
     {
         $company = trim($_POST["company"]);
     }
-
-    if (empty($firstname_err) && empty($lastname_err) && empty($role_err) && empty($company_err))
+    // validate phone number
+    if (empty(trim($_POST["phone_number"])))
     {
-        $sql = "UPDATE users SET firstname = '$firstname',lastname='$lastname',company = '$company',role='$role' WHERE id = ?";
+        //$phone_number_err = "Please enter your phone number.";
+    }
+    else
+    {
+        $phone_number = trim($_POST["phone_number"]);
+    }
+
+    if (empty($firstname_err) && empty($lastname_err) && empty($role_err) && empty($company_err) && empty($phone_number_err))
+    {
+        $sql = "UPDATE users SET firstname = '$firstname',lastname='$lastname',company = '$company',role='$role', phone_number='$phone_number' WHERE id = ?";
         if ($stmt = mysqli_prepare($link, $sql))
         {
             mysqli_stmt_bind_param($stmt, "i", $param_user_id);
@@ -84,7 +93,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
     }
 }
 
-$sql = "SELECT created,firstname,lastname,role,company,email FROM users WHERE id = ?";
+$sql = "SELECT created,firstname,lastname,role,company,email,phone_number FROM users WHERE id = ?";
 if ($stmt = mysqli_prepare($link, $sql))
 {
     mysqli_stmt_bind_param($stmt, "i", $param_user_id);
@@ -94,7 +103,7 @@ if ($stmt = mysqli_prepare($link, $sql))
         mysqli_stmt_store_result($stmt);
         if (mysqli_stmt_num_rows($stmt) == 1)
         {
-            if (mysqli_stmt_bind_result($stmt, $created, $firstname, $lastname, $role, $company, $email))
+            if (mysqli_stmt_bind_result($stmt, $created, $firstname, $lastname, $role, $company, $email,$phone_number))
             {
                 if (mysqli_stmt_fetch($stmt))
                 {
@@ -339,6 +348,21 @@ mysqli_close($link);
                 </div>
 
                 <div class="form-group row">
+                <label class="col-lg-3 control-label">Email address:</label>
+                <div class="col-lg-8">
+                    <input class="form-control" value="<?php echo $email; ?>" type="text" disabled>
+                </div>
+                </div>
+
+                <div class="form-group row">
+                <label class="col-lg-3 control-label">Phone number:</label>
+                <div class="col-lg-8">
+                    <input class="form-control edit-profile" value="<?php echo $phone_number; ?>" name ="phone_number" type="text" disabled>
+                    <span class="help-block"><?php echo $phone_number_err; ?></span>
+                </div>
+                </div>
+
+                <div class="form-group row">
                 <label class="col-lg-3 control-label">Company:</label>
                 <div class="col-lg-8">
                     <input class="form-control edit-profile" style="text-transform: capitalize;" value="<?php echo $company; ?>" name ="company" type="text" disabled>
@@ -353,12 +377,11 @@ mysqli_close($link);
                 </div>
                 </div>
 
-                <div class="form-group row">
-                <label class="col-lg-3 control-label">Email:</label>
-                <div class="col-lg-8">
-                    <input class="form-control" value="<?php echo $email; ?>" type="text" disabled>
-                </div>
-                </div>
+
+
+
+
+
 
                 <div class="form-group row">
                 <label class="col-md-3 control-label"></label>

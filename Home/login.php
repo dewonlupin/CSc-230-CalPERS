@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
     // Validate email
     if (empty(trim($_POST["username"])))
     {
-        $email_err = "Please enter username.";
+        $email_err = "Please enter your email.";
     }
     else
     {
@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
     // Validate credentials
     if (empty($email_err) && empty($password_err))
     {
-        $sql = "SELECT id,firstname,lastname,email,company,role,password,verified FROM users WHERE email = ?";
+        $sql = "SELECT id,email,password,verified FROM users WHERE email = ?";
 
         // Prepares the statement
         if ($stmt = mysqli_prepare($link, $sql))
@@ -62,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
                 if (mysqli_stmt_num_rows($stmt) == 1)
                 {
                     // Bind result variables
-                    mysqli_stmt_bind_result($stmt, $id, $firstname, $lastname, $email, $company, $role, $hashed_password, $vefified);
+                    mysqli_stmt_bind_result($stmt, $id, $email, $hashed_password, $vefified);
                     if (mysqli_stmt_fetch($stmt))
                     {
                         if ($vefified)
@@ -163,9 +163,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
                             <div class="col-2">
                               <div class="input-container">
                                 <i class="fa fa-user icon"></i>
-                                <input class="input-field input--style-4" type="text"  name="username" placeholder="User Name"  value="<?php echo $email; ?>">
-                                    <p><span class="help-block"><?php echo $email_err; ?></span></p>
-                                </div>
+                                <input class="input-field input--style-4" type="text"  name="username" placeholder="Email"  value="<?php echo $email; ?>">
+                              </div>
+                              <span class="help-block"><?php echo $email_err; ?></span>
+
                             </div>
 
                         </div>
