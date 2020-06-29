@@ -90,12 +90,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
                         }
                         else
                         {
-                            $alert = "We have already sent you a verification email. Please verify your account to log in.";
+                            $alert = "We have sent you a verification email. Please verify your account to log in.";
                             echo "<script type='text/javascript'>alert('$alert');</script>";
                         }
                     }
-                    else {
-                      echo "Results were not fetched properly.";
+                    else
+                    {
+                        echo "Results were not fetched properly.";
                     }
                 }
                 else
@@ -112,7 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
         }
         else
         {
-          echo "Preparing SQL statement failed. Please try again later.";
+            echo "Preparing SQL statement failed. Please try again later.";
         }
     }
     // Close connection

@@ -13,12 +13,22 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true)
 }
 
 // Define variables
+$current_password_err = $current_password = "";
 $new_password = $confirm_password = "";
 $new_password_err = $confirm_password_err = "";
 
 // Processing form data when form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST")
 {
+    // Validate current password
+    if (empty(trim($_POST["current_password"])))
+    {
+        $current_password_err = "Please enter your current password.";
+    }
+    else
+    {
+        $current_password = trim($_POST["current_password"]);
+    }
     // Validate new password
     if (empty(trim($_POST["new_password"])))
     {
@@ -65,9 +75,58 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
             $confirm_password_err = "Password did not match.";
         }
     }
-    // Check input errors before updating the database
-    if (empty($new_password_err) && empty($confirm_password_err))
+
+    $sql = "SELECT password FROM users WHERE id = ?";
+    $current_password_err = "Current password is incorrect.";
+    if ($stmt = mysqli_prepare($link, $sql))
     {
+        mysqli_stmt_bind_param($stmt, "i", $param_id);
+        $param_id = $_SESSION["id"];
+        if (mysqli_stmt_execute($stmt))
+        {
+            mysqli_stmt_store_result($stmt);
+            if (mysqli_stmt_num_rows($stmt) == 1)
+            {
+                mysqli_stmt_bind_result($stmt, $hashed_password);
+                if (mysqli_stmt_fetch($stmt))
+                {
+                    if (password_verify($current_password, $hashed_password))
+                    {
+                        $current_password_err = "";
+                    }
+                    else
+                    {
+                        $current_password_err = "Current password is incorrect.";
+                    }
+
+                }
+                else
+                {
+                    echo "Failed fetching the results.";
+                }
+            }
+            else
+            {
+                echo "Something went wrong. Please Try again later.";
+            }
+
+        }
+        else
+        {
+            echo "Failed executing the SQL statement";
+        }
+
+    }
+    else
+    {
+        echo "Failed preparing the SQL statement";
+    }
+    mysqli_stmt_close($stmt);
+
+    // Check input errors before updating the database
+    if (empty($new_password_err) && empty($confirm_password_err) && empty($current_password_err))
+    {
+
         // Prepare an update statement
         $sql = "UPDATE users SET password = ? WHERE id = ?";
 
@@ -292,6 +351,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
             <h3 class="d-flex justify-content-center">Reset Password</h3>
             <br><br>
             <form class="form-horizontal" role="form" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+
+              <div class="form-group row">
+              <label class="col-lg-3 control-label ">Current password:</label>
+              <div class="col-lg-8">
+                  <input  class="form-control edit-profile" type="password" value="<?php echo $current_password; ?>" name="current_password" >
+                  <span class="help-block"><?php echo $current_password_err; ?></span>
+              </div>
+              </div>
+
+
+
                 <div class="form-group row">
                 <label class="col-lg-3 control-label ">New password:</label>
                 <div class="col-lg-8">
@@ -375,50 +445,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 
 
-<script>
-    function editprofile() {
-    $("#edit").hide();
-    $('.edit-profile').removeAttr("disabled");
-
-    $("#save").show();
-    $("#cancel").show();
-
-    }
-
-    function cancelgg() {
-    $("#edit").show();
-    $('.edit-profile').addAttr("disabled");
-
-    $("#save").hide();
-    $("#cancel").hide();
-    }
-
-
-$( "#cancel" ).click(function() {
-    $("#save").hide();
-    $("#cancel").hide();
-  $("#edit").show();
-    $('.edit-profile').attr("disabled", true);
-
-
-});
-
-
-$( "#save" ).click(function() {
-    $("#save").hide();
-    $("#cancel").hide();
-  $("#edit").show();
-    //$('.edit-profile').attr("disabled", true);
-/*
-    /swal({
-  title: "Profile Updated Successfully!",
-  icon: "success",
-});
-*/
-
-
-});
-
-</script>
 </body>
 </html>
