@@ -156,6 +156,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
             if (mysqli_stmt_execute($stmt))
             {
                 // Redirect to login page
+
                 header("Refresh:0; url=./login.php");
             }
             else

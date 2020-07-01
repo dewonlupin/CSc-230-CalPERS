@@ -207,13 +207,95 @@ mysqli_close($link);
   <meta name="description" content="Signature Pad - HTML5 canvas based smooth signature drawing using variable width spline interpolation.">
 
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no">
-
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
+   <meta charset="utf-8">
+	
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Crop Singnature</title>
+  <meta charset="utf-8">	
+  <meta http-equiv="x-ua-compatible" content="ie=edge">	
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" crossorigin="anonymous">	
+  <link rel="stylesheet" href="cropper.css">
+	
+  <script src="js/html2canvas.js"></script>
 
 <!--<link rel="stylesheet" href="build/css/signature-pad.css">-->
   <style type="text/css">
+  .page {
+        margin: 1em auto;
+        max-width: 768px;
+        display: flex;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        min-height:10% !important;
+        height: 100%;
+}
+	
+.box {
+	
+        padding: 0.5em;	
+        width: 100%;
+        margin:0.5em;
+}
+	
+.box-2 {	
+        padding: 0.5em;	
+        width: calc(100%/2 - 1em);	
+}
 
+.options label,
+	
+.options input{
+	
+        width:4em;
+
+        padding:0.5em 1em;
+	
+}
+	
+.butn{
+	
+        background:white;
+        color:black;
+        border:1px solid black;
+        padding: 0.5em 1em;	
+        text-decoration:none;
+        margin:0.8em 0.3em;
+        display:inline-block;
+        cursor:pointer;
+}
+.hide {
+        display: none;
+}
+img {
+        max-width: 100%;
+}	
+  .label {	
+      cursor: pointer;	
+  }	
+    }	
+    .progress {
+      display: none;	
+      margin-bottom: 1rem;	
+    }
+    .alert {
+      display: none;
+    }
+
+    .img-container img {
+      max-width: 100%;
+    }
+
+   .wrapper{
+
+    min-height:10% !important;
+
+  }
   td, th{
       text-align: center;
   }
@@ -241,13 +323,91 @@ mysqli_close($link);
 
   </style>
 
-
+  <!-- scipts and requirements for cropping feature-->
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <script src="./js/cropper.js"></script>
+  <link rel='stylesheet' href='plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css'>
+  <!-- Toastr -->
+  <link rel='stylesheet' href='plugins/toastr/toastr.min.css'>
+  <script src='plugins/sweetalert2/sweetalert2.min.js'></script>
+<!-- Toastr -->
+<script src='plugins/toastr/toastr.min.js'></script>
   <script type="text/javascript">
+// save on click
 
+  // remove hide class of img
+ 
   // viewing images in full screen
   $(document).ready(function() {
-  $('.image-link').magnificPopup({type:'image'});
+  $("#saveSig").click(function(e){
+	var canvas = document.getElementById('sig-pad');			var canvas_img_data = canvas.toDataURL();			var img_data = canvas_img_data.replace(/^data:image\/(png|jpg);base64,/, "");			//ajax call to save image inside folder			$.ajax({				url: 'upload_sign.php',				data: { img_data:img_data },				type: 'post',				dataType: 'json',				success: function (response) {
+      
+        signaturePad.clear();				    toastr.success('Signature Saved Successfully!');				}			});		});
+  let result = document.querySelector('.result'),
+img_result = document.querySelector('.img-result'),
+img_w = document.querySelector('.img-w'),
+img_h = document.querySelector('.img-h'),
+options = document.querySelector('.options'),
+save = document.querySelector('.save'),
+cropped = document.querySelector('.cropped'),
+dwn = document.querySelector('.download'),
+upload = document.querySelector('#input-file'),
+cropper = '';
+
+// on change show image with crop options
+upload.addEventListener('change', (e) => {
+  if (e.target.files.length) {
+		// start file reader
+    const reader = new FileReader();
+    reader.onload = (e)=> {
+      if(e.target.result){
+				// create new image
+				let img = document.createElement('img');
+				img.id = 'image';
+				img.src = e.target.result
+				// clean result before
+				result.innerHTML = '';
+				// append new image
+        result.appendChild(img);
+				// show save btn and options
+				save.classList.remove('hide');
+				options.classList.remove('hide');
+				// init cropper
+				cropper = new Cropper(img);
+      }
+    };
+    reader.readAsDataURL(e.target.files[0]);
+  }
+});
+$("#cropimg").click(function(e){
+  e.preventDefault();
+  // get result to data uri
+  let imgSrc = cropper.getCroppedCanvas({
+		width: img_w.value // input value
+	}).toDataURL();
+ cropped.classList.remove('hide');
+	img_result.classList.remove('hide');
+	// show image cropped
+  cropped.src = imgSrc;
+  
+	var image_data = imgSrc.replace(/^data:image\/(png|jpg);base64,/, "");
+	$.ajax({
+		url: 'crop_sign.php',
+		data: {image_data:image_data},
+		type: 'post',
+		dataType: 'json',
+		success: function(response){
+		//window.location.reload();
+		}
+});
+dwn.classList.remove('hide');
+  dwn.download = 'imagename.png';
+  dwn.setAttribute('href',imgSrc);
+});
+$('.image-link').magnificPopup({type:'image'});
   });
+
   </script>
 
 
@@ -320,50 +480,42 @@ mysqli_close($link);
                   <ul class="nav nav-pills ml-auto p-2">
                     <li class="nav-item"><a class="nav-link active" href="#tab_1" data-toggle="tab">Draw</a></li>
                     <li class="nav-item"><a id="t2" class="nav-link" href="#tab_2" data-toggle="tab">Upload</a></li>
-                    <li class="nav-item"><a id="t3" class="nav-link" href="#tab_3" data-toggle="tab">Saved Signatures</a></li>
+                    <li class="nav-item"><a id="t3" class="nav-link" href="#tab_3" data-toggle="tab">My Signatures</a></li>
                   </ul>
                 </div><!-- /.card-header -->
                 <div class="card-body">
                   <div class="tab-content">
                     <div class="tab-pane active" id="tab_1">
 
-                      <div id="signature-pad" class="signature-pad">
+                                          <div id="signature-pad" class="signature-pad">
           <div class="signature-pad--body">
-
-            <canvas class="canvasbody" style="height: 400px !important;"></canvas>
-
-
+            <canvas class="canvasbody" id="sig-pad" style="height: 400px !important;"></canvas>
           </div>
           <div class="signature-pad--footer">
             <div class="description">Sign above</div>
-
-
             <div class="signature-pad--actions">
           <div class="row col-md-9">
             <button type="button" class="col-md-3 offset-md-1 btn btn-primary btn-block" style="margin:5px; margin-top:5px;" data-action="clear">Clear</button>
             <button type="button" class="col-md-3 offset-md-1 btn btn-primary btn-block" data-action="undo">Undo</button>
-            <button type="button" class="col-md-3 offset-md-1 btn btn-primary btn-block" data-action="change-color">Save Signature</button>
-
+            <button type="button" class="col-md-3 offset-md-1 btn btn-primary btn-block"  id="saveSig">Save Signature</button>
           </div>
-       							<div class="row" style="margin-top:5px;margin-bottom:5px"></div>
-       							<div class="row col-md-9" >
-       								<button type="button" data-jscolor="{valueElement:'hexclr',value:'pick color', hash:true}" class="col-md-3  btn btn-primary btn-block" style="margin-left:6px;">Pick color</button>
-       								<b class="col-md-3 offset-md-1"> Chosen color:<input id="hexclr"  name="hexclr" size="6" type="text"/></b>
-       								<button class="col-md-3 offset-md-1 btn btn-primary btn-block" onclick="setcolor(document.getElementById('hexclr').value)"  type="button" style="margin-left:77px;">Select color</button>
-       							</div>
+        <div class="row" style="margin-top:5px;margin-bottom:5px"></div>
+        <div class="row col-md-9" >
+        <button type="button" data-jscolor="{valueElement:'hexclr',value:'pick color', hash:true}" class="col-md-3  btn btn-primary btn-block" style="margin-left:6px;margin:5px; margin-top:5px;">Pick color</button>
+        <b class="col-md-3 offset-md-1 btn-primary btn-block"> Chosen color:<input id="hexclr"  name="hexclr" size="5" type="text"/></b>
+        <button class="col-md-3 offset-md-1 btn btn-primary btn-block" onclick="setcolor(document.getElementById('hexclr').value)"  type="button">Select color</button>
+        </div>
 
-       							<div class="row" style="margin-top:5px;margin-bottom:5px"></div>
+        <div class="row" style="margin-top:5px;margin-bottom:5px"></div>
 
-       							<div class="row col-md-9">
-       							  <button type="button" class="col-md-3  btn btn-primary btn-block" data-action="save-png" style="margin:5px; margin-top:4px;">Download as PNG</button>
-       							  <button type="button" class="col-md-3  offset-md-1 btn btn-primary btn-block" data-action="save-jpg">Download as JPG</button>
-       							  <button type="button" class="col-md-3  offset-md-1 btn btn-primary btn-block" data-action="save-svg">Download as SVG</button>
-       							</div>
-       						  </div>
-       						</div>
-       					</div>
-
-
+        <div class="row col-md-9">
+         <button type="button" class="col-md-3  btn btn-primary btn-block" data-action="save-png" style="margin:5px; margin-top:4px;">Download as PNG</button>
+         <button type="button" class="col-md-3  offset-md-1 btn btn-primary btn-block" data-action="save-jpg">Download as JPG</button>
+         <button type="button" class="col-md-3  offset-md-1 btn btn-primary btn-block" data-action="save-svg">Download as SVG</button>
+        </div>
+         </div>
+        </div>
+        </div>
                       <script src="js/signature_pad.js"></script>
                       <script src="js/app.js"></script>
                       <script src="js/jscolor.js"></script>
@@ -381,7 +533,7 @@ mysqli_close($link);
           <!-- left column -->
           <div class="col-md-6">
             <!-- general form elements -->
-            <div class="card card-primary">
+            <div class="card card-primary" style="height:500px;width:1000px">
 
               <!-- /.card-header -->
               <!-- form start -->
@@ -390,14 +542,45 @@ echo "?tab=t3"
 ?>" method="post" enctype="multipart/form-data">
                 <div class="card-body">
                   <div class="form-group">
-                    <label for="fileToUpload">File input</label>
+                    <main class="page">
+
+	<!-- input file -->
+	<div class="box">
+		
+	</div>
+	<!-- leftbox -->
+	<div class="box-2">
+		
+	</div>
+	<!--rightbox-->
+	<div class="box-2 img-result hide">
+		<!-- result of crop -->
+		
+	</div>
+	<!-- input file -->
+	
+  	
+</main>
+                    <label for="fileToUpload">Select Signature</label>
                     <div class="input-group">
                       <div class="custom-file">
-                        <input type="file" name="fileToUpload"  id="fileToUpload">
+                       <input type="file" id="input-file"> 
+                       <div class="result"></div>
+                       
                         <!--<label class="custom-file-label" for="fileToUpload">Choose file</label> -->
-                        <input type="submit" value="Upload Signature" name="submit">
+                       
                       </div>
+                      <div class="row" style="margin-top:110px"><img class="cropped" src="" alt=""></div>
                       <div class="input-group-append">
+                      <div class="box">
+		<div class="options hide">
+			<input type="number" style="display:none" class="img-w" value="300" min="100" max="1200" />
+		</div>
+		<!-- save btn -->
+		<button class="btn btn-primary save hide" id="cropimg">Crop</button>
+		<!-- download btn -->
+		 <input class="btn btn-primary  download hide" value="Upload Signature">
+	</div>
                         <!--<span class="input-group-text" id="">Upload</span>-->
                         <!-- <input type="submit" value="Upload Signature" name="submit"> -->
                       </div>
@@ -500,6 +683,19 @@ mysqli_stmt_close($stmt);
 <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
 <script>
   $.widget.bridge('uibutton', $.ui.button)
+
+   $('input:file').change(
+            function(){
+                if ($(this).val()) {
+                    $('input:submit').attr('disabled',false);
+                    // or, as has been pointed out elsewhere:
+                    // $('input:submit').removeAttr('disabled'); 
+                } 
+            }
+            );
+ 
+
+
 </script>
 
 

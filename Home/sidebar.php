@@ -1,4 +1,14 @@
-<body class="hold-transition sidebar-mini layout-fixed">
+ <script src="plugins/jquery/jquery.min.js"></script>
+<!-- jQuery UI 1.11.4 -->
+<script src="plugins/jquery-ui/jquery-ui.min.js"></script>
+ <link rel="stylesheet" href="plugins/sweetalert2-theme-bootstrap-4/bootstrap-4.min.css">
+  <!-- Toastr -->
+  <link rel="stylesheet" href="plugins/toastr/toastr.min.css">
+  <script src="plugins/sweetalert2/sweetalert2.min.js"></script>
+<!-- Toastr -->
+<script src="plugins/toastr/toastr.min.js"></script>
+ <link href="vendor/font-awesome-4.7/css/font-awesome.min.css" rel="stylesheet" media="all">
+<body class="hold-transition sidebar-mini layout-fixed sidebar-collapse">
   <div class="wrapper">
 
     <!-- Navbar -->
@@ -12,7 +22,7 @@
             </ul>
             <ul class="navbar-nav">
                 <li class="nav-item">
-                        <a href="logout.php" class="btn btn-danger">Sign Out of Your Account</a>
+                        <a href="logout.php" class="btn btn-primary">Sign Out <i class="fa fa-sign-out"></i></a>
                 </li>
 
             </ul>
@@ -43,7 +53,14 @@
             <!-- Add icons to the links using the .nav-icon class
           with font-awesome or any other icon font library -->
             <li class="nav-item has-treeview menu-open">
-
+            <li class="nav-item">
+              <a href="Home.php" class="nav-link">
+                <i class="nav-icon fas fa-home"></i>
+                <p>
+                 Home
+                </p>
+              </a>
+            </li>
             <li class="nav-item">
               <a href="profile.php" class="nav-link">
                 <i class="nav-icon fas fa-user"></i>

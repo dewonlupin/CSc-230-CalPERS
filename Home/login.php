@@ -5,7 +5,7 @@ session_start();
 // Checks if the user is already logged in, if yes then redirect them to profile page
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true)
 {
-    header("location: profile.php");
+    header("location: home.php");
     exit;
 }
 
@@ -80,7 +80,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
                                 $_SESSION["id"] = $id;
 
                                 // Redirects user to profile page
-                                header("location: profile.php");
+
+                                header("location: home.php");
                             }
                             else
                             {
