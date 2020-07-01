@@ -346,7 +346,7 @@ else
             <h3 class="d-flex justify-content-center">Welcome to E signature Portal.</h3>
             <br><br>
             <h5 id="sign">You have <?php echo $total; ?> Saved signature. You can go to <a href="Signature.php">signature Page</a> and edit the signature.</h5>
-            <h5 id="nosign">You dont have any signature saved. Please go to the <a href="Signature.php">signature Page</a> where you can draw your signature Or Upload an image of a signature.</h5>
+            <h5 id="nosign">You don't have any signature saved. Please go to the <a href="Signature.php">signature Page</a> where you can draw your signature or Upload an image of a signature.</h5>
             <br><br>
            
             </div>
