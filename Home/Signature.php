@@ -561,16 +561,16 @@ echo "?tab=t3"
 	
   	
 </main>
-                    <label for="fileToUpload">Select Signature</label>
+                   <label for="fileToUpload">Select Signature</label>
                     <div class="input-group">
                       <div class="custom-file">
                        <input type="file" id="input-file"> 
-                       <div class="result"></div>
+                       <div class="result" style="height:200px; width:400px;"></div>
                        
                         <!--<label class="custom-file-label" for="fileToUpload">Choose file</label> -->
                        
                       </div>
-                      <div class="row" style="margin-top:110px"><img class="cropped" src="" alt=""></div>
+                      <div class="row" style="margin-top:110px;"><img class="cropped" style="" src="" alt=""></div>
                       <div class="input-group-append">
                       <div class="box">
 		<div class="options hide">
@@ -579,7 +579,7 @@ echo "?tab=t3"
 		<!-- save btn -->
 		<button class="btn btn-primary save hide" id="cropimg">Crop</button>
 		<!-- download btn -->
-		 <input class="btn btn-primary  download hide" value="Upload Signature">
+		 <input class="btn btn-primary  download hide" value="Upload Signature" style="width:150px;">
 	</div>
                         <!--<span class="input-group-text" id="">Upload</span>-->
                         <!-- <input type="submit" value="Upload Signature" name="submit"> -->
