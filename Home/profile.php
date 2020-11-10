@@ -1,13 +1,10 @@
 <?php
 // Initialize the session
 session_start();
-
 // Include config file
 require_once "config.php";
-
 // Check if the user is logged in, if not then redirect them to login page
-if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true)
-{
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     header("location: login.php");
     exit;
 }
@@ -16,67 +13,47 @@ $created = $firstname = $lastname = $email = $role = $password = "";
 $employee = $phone_number = $company = "";
 $firstname_err = $lastname_err = $email_err = $role_err = $password_err = "";
 $employee_err = $phone_number_err = $company_err = "";
-
 // Processing form data when form is submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST")
-{
-
-    if (empty(trim($_POST["firstname"])))
-    {
-
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // validate firstname
+    if (empty(trim($_POST["firstname"]))) {
         $firstname_err = "Please enter your first name.";
-    }
-    else
-    {
+    } else {
         $firstname = ucfirst(trim($_POST["firstname"]));
     }
     // validate lastname
-    if (empty(trim($_POST["lastname"])))
-    {
+    if (empty(trim($_POST["lastname"]))) {
         $lastname_err = "Please enter your last name.";
-    }
-    else
-    {
+    } else {
         $lastname = ucfirst(trim($_POST["lastname"]));
     }
     // validate role
-    if (empty(trim($_POST["role"])))
-    {
+    if (empty(trim($_POST["role"]))) {
         //$role_err = "Please enter your role.";
-    }
-    else
-    {
+
+    } else {
         $role = trim($_POST["role"]);
     }
-
     // validate company
-    if (empty(trim($_POST["company"])))
-    {
+    if (empty(trim($_POST["company"]))) {
         //$company_err = "Please enter the name of the company you work for.";
-    }
-    else
-    {
+
+    } else {
         $company = trim($_POST["company"]);
     }
     // validate phone number
-    if (empty(trim($_POST["phone_number"])))
-    {
+    if (empty(trim($_POST["phone_number"]))) {
         //$phone_number_err = "Please enter your phone number.";
-    }
-    else
-    {
+
+    } else {
         $phone_number = trim($_POST["phone_number"]);
     }
-
-    if (empty($firstname_err) && empty($lastname_err) && empty($role_err) && empty($company_err) && empty($phone_number_err))
-    {
+    if (empty($firstname_err) && empty($lastname_err) && empty($role_err) && empty($company_err) && empty($phone_number_err)) {
         $sql = "UPDATE users SET firstname = '$firstname',lastname='$lastname',company = '$company',role='$role', phone_number='$phone_number' WHERE id = ?";
-        if ($stmt = mysqli_prepare($link, $sql))
-        {
+        if ($stmt = mysqli_prepare($link, $sql)) {
             mysqli_stmt_bind_param($stmt, "i", $param_user_id);
             $param_user_id = $_SESSION["id"];
-            if (mysqli_stmt_execute($stmt))
-            {
+            if (mysqli_stmt_execute($stmt)) {
                 //close the statement
                 mysqli_stmt_close($stmt);
                 echo "<html><head><script src='plugins/jquery/jquery.min.js'></script>
@@ -89,66 +66,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 <!-- Toastr -->
 <script src='plugins/toastr/toastr.min.js'></script> </head><body><script>
                 toastr.success('Profile Updated Successfully!');
-                  
+
                 </script></body></html>";
-                
-          }
-            else
-            {
+            } else {
                 echo "Executing SQL statement failed. Please try again later.";
             }
-        }
-        else
-        {
+        } else {
             echo "ooops! Something went wrong. Please try again later2.";
         }
-
     }
 }
-
 $sql = "SELECT created,firstname,lastname,role,company,email,phone_number FROM users WHERE id = ?";
-if ($stmt = mysqli_prepare($link, $sql))
-{
+if ($stmt = mysqli_prepare($link, $sql)) {
     mysqli_stmt_bind_param($stmt, "i", $param_user_id);
     $param_user_id = $_SESSION["id"];
-    if (mysqli_stmt_execute($stmt))
-    {
+    if (mysqli_stmt_execute($stmt)) {
         mysqli_stmt_store_result($stmt);
-        if (mysqli_stmt_num_rows($stmt) == 1)
-        {
-            if (mysqli_stmt_bind_result($stmt, $created, $firstname, $lastname, $role, $company, $email,$phone_number))
-            {
-                if (mysqli_stmt_fetch($stmt))
-                {
+        if (mysqli_stmt_num_rows($stmt) == 1) {
+            if (mysqli_stmt_bind_result($stmt, $created, $firstname, $lastname, $role, $company, $email, $phone_number)) {
+                if (mysqli_stmt_fetch($stmt)) {
                     //echo "all good.";
 
-                }
-                else
-                {
+                } else {
                     echo "Failed fetching the values. Please try again later.";
                 }
-            }
-            else
-            {
+            } else {
                 echo "Failed binding the results";
             }
-        }
-        else
-        {
+        } else {
             echo "No account has found.";
         }
         //close the statement
         mysqli_stmt_close($stmt);
     }
-}
-else
-{
+} else {
     echo "failed at preparing the SQL statement.";
 }
-
 // Close connection
 mysqli_close($link);
-
 ?>
 <!DOCTYPE html>
 <html>
@@ -328,7 +283,7 @@ mysqli_close($link);
             </div><!-- /.col -->
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item"><a href="profile.php" style="color: #276a91">Home</a></li>
+                <li class="breadcrumb-item"><a href="Home.php" style="color: #276a91">Home</a></li>
                 <li class="breadcrumb-item active">Profile</li>
               </ol>
             </div><!-- /.col -->
@@ -415,7 +370,7 @@ mysqli_close($link);
                     <span></span>
                     <input class="btn btn-default" value="Cancel" type="reset" id="cancel"style="display:none" onclick="cancel()">
                     <button type="button" style="display:none" class="btn btn-success toastrDefaultSuccess">
-                 
+
                 </button>
                 </div>
                 </div>

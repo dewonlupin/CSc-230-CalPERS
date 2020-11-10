@@ -1,161 +1,103 @@
 <?php
 // Initialize the session
 session_start();
-
 // Include config file
 require_once "config.php";
-
 // Check if the user is logged in, if not then redirect them to login page
-if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true)
-{
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     header("location: login.php");
     exit;
 }
-
 // Define variables
 $current_password_err = $current_password = "";
 $new_password = $confirm_password = "";
 $new_password_err = $confirm_password_err = "";
-
 // Processing form data when form is submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST")
-{
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validate current password
-    if (empty(trim($_POST["current_password"])))
-    {
+    if (empty(trim($_POST["current_password"]))) {
         $current_password_err = "Please enter your current password.";
-    }
-    else
-    {
+    } else {
         $current_password = trim($_POST["current_password"]);
     }
     // Validate new password
-    if (empty(trim($_POST["new_password"])))
-    {
+    if (empty(trim($_POST["new_password"]))) {
         $new_password_err = "Please enter a password.";
-    }
-    elseif (strlen(trim($_POST["new_password"])) < 8)
-    {
+    } elseif (strlen(trim($_POST["new_password"])) < 8) {
         $new_password_err = "Password must have at least eight characters.";
-    }
-    elseif (!preg_match('@[A-Z]@', trim($_POST["new_password"])))
-    {
+    } elseif (!preg_match('@[A-Z]@', trim($_POST["new_password"]))) {
         $new_password_err = "Password must have at least one uppercase letter";
-    }
-    elseif (!preg_match('@[a-z]@', trim($_POST["new_password"])))
-    {
+    } elseif (!preg_match('@[a-z]@', trim($_POST["new_password"]))) {
         $new_password_err = "Password must have at least one lowercase letter";
-
-    }
-    elseif (!preg_match('@[0-9]@', trim($_POST["new_password"])))
-    {
+    } elseif (!preg_match('@[0-9]@', trim($_POST["new_password"]))) {
         $new_password_err = "Password must have at least one number digit";
-
-    }
-    elseif (!preg_match('@[^\w]@', trim($_POST["new_password"])))
-    {
+    } elseif (!preg_match('@[^\w]@', trim($_POST["new_password"]))) {
         $new_password_err = "Password must have at least one special character";
-    }
-
-    else
-    {
+    } else {
         $new_password = trim($_POST["new_password"]);
     }
-
     // Validate confirm password
-    if (empty(trim($_POST["confirm_password"])))
-    {
+    if (empty(trim($_POST["confirm_password"]))) {
         $confirm_password_err = "Please confirm password.";
-    }
-    else
-    {
+    } else {
         $confirm_password = trim($_POST["confirm_password"]);
-        if (empty($new_password_err) && ($new_password != $confirm_password))
-        {
+        if (empty($new_password_err) && ($new_password != $confirm_password)) {
             $confirm_password_err = "Password did not match.";
         }
     }
-
     $sql = "SELECT password FROM users WHERE id = ?";
     $current_password_err = "Current password is incorrect.";
-    if ($stmt = mysqli_prepare($link, $sql))
-    {
+    if ($stmt = mysqli_prepare($link, $sql)) {
         mysqli_stmt_bind_param($stmt, "i", $param_id);
         $param_id = $_SESSION["id"];
-        if (mysqli_stmt_execute($stmt))
-        {
+        if (mysqli_stmt_execute($stmt)) {
             mysqli_stmt_store_result($stmt);
-            if (mysqli_stmt_num_rows($stmt) == 1)
-            {
+            if (mysqli_stmt_num_rows($stmt) == 1) {
                 mysqli_stmt_bind_result($stmt, $hashed_password);
-                if (mysqli_stmt_fetch($stmt))
-                {
-                    if (password_verify($current_password, $hashed_password))
-                    {
+                if (mysqli_stmt_fetch($stmt)) {
+                    if (password_verify($current_password, $hashed_password)) {
                         $current_password_err = "";
-                    }
-                    else
-                    {
+                    } else {
                         $current_password_err = "Current password is incorrect.";
                     }
-
-                }
-                else
-                {
+                } else {
                     echo "Failed fetching the results.";
                 }
-            }
-            else
-            {
+            } else {
                 echo "Something went wrong. Please Try again later.";
             }
-
-        }
-        else
-        {
+        } else {
             echo "Failed executing the SQL statement";
         }
-
-    }
-    else
-    {
+    } else {
         echo "Failed preparing the SQL statement";
     }
     mysqli_stmt_close($stmt);
-
     // Check input errors before updating the database
-    if (empty($new_password_err) && empty($confirm_password_err) && empty($current_password_err))
-    {
-
+    if (empty($new_password_err) && empty($confirm_password_err) && empty($current_password_err)) {
         // Prepare an update statement
-        $sql = "UPDATE users SET password = ? WHERE id = ?";
-
-        if ($stmt = mysqli_prepare($link, $sql))
-        {
+        $sql = "UPDATE users SET password = ?,password_expires=? WHERE id = ?";
+        if ($stmt = mysqli_prepare($link, $sql)) {
             // Bind variables to the prepared statement as parameters
-            mysqli_stmt_bind_param($stmt, "si", $param_password, $param_id);
-
+            mysqli_stmt_bind_param($stmt, "ssi", $param_password,$param_password_expires, $param_id);
             // Set parameters
             $param_password = password_hash($new_password, PASSWORD_DEFAULT);
+            $now = new DateTime();
+            $param_password_expires = $now->modify('+1 year')->format('Y-m-d H:i:s');
             $param_id = $_SESSION["id"];
-
             // Attempt to execute the prepared statement
-            if (mysqli_stmt_execute($stmt))
-            {
+            if (mysqli_stmt_execute($stmt)) {
                 // Password updated successfully. Destroy the session, and redirect to login page
                 session_destroy();
                 header("location: login.php");
                 exit();
-            }
-            else
-            {
+            } else {
                 echo "Failed Executing the SQL statement. Please try again later.";
             }
             // Close statement
             mysqli_stmt_close($stmt);
         }
     }
-
     // Close connection
     mysqli_close($link);
 }
@@ -205,7 +147,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
     min-height:10% !important;
 
   }
-  
+
 .emp-profile{
     padding: 3%;
     margin-top: 3%;
@@ -301,9 +243,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 
   </style>
 
-
-
-
   <!--[if IE]>
     <link rel="stylesheet" type="text/css" href="css/ie9.css">
   <![endif]-->
@@ -319,8 +258,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
       var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
     })();
   </script>
-
-
   </head>
   <body>
 
@@ -335,7 +272,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
             </div><!-- /.col -->
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item"><a href="profile.php" style="color: #276a91">Home</a></li>
+                <li class="breadcrumb-item"><a href="Home.php" style="color: #276a91">Home</a></li>
                 <li class="breadcrumb-item active">Security</li>
               </ol>
             </div><!-- /.col -->

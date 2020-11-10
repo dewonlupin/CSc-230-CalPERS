@@ -1,0 +1,18 @@
+Below are instructions for downloading and installing composer and swiftmailer.
+I'm using XAMPP-VM on Mac. You may need to change the commands depending on operating system you use.
+
+1. Install composer:
+
+  sudo curl -s https://getcomposer.org/installer | /opt/lampp/bin/php
+
+  sudo ln -s /opt/lampp/bin/php /usr/local/bin/php
+
+  sudo mv composer.phar /usr/local/bin/composer
+
+2. Change directory to htdocs:
+
+  cd /opt/lampp/htdocs
+
+3. Install swiftmailer:
+
+  sudo composer require "swiftmailer/swiftmailer:^6.0"

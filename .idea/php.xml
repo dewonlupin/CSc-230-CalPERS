@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PhpIncludePathManager">
+    <include_path>
+      <path value="$PROJECT_DIR$/Home/vendor/font-awesome-4.7/fonts" />
+      <path value="$PROJECT_DIR$/Home/vendor/font-awesome-4.7/css" />
+      <path value="$PROJECT_DIR$/Home/vendor/mdi-font/fonts" />
+      <path value="$PROJECT_DIR$/Home/vendor/mdi-font/css" />
+    </include_path>
+  </component>
+</project>

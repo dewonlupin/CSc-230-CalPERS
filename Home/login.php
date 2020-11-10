@@ -1,119 +1,91 @@
 <?php
 // Initialize the session
 session_start();
-
-// Checks if the user is already logged in, if yes then redirect them to profile page
-if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true)
-{
-    header("location: home.php");
-    exit;
-}
-
 // Include config file
 require_once "config.php";
-
+// Checks if the user is already logged in, if yes then redirect them to profile page
+if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
+    header("location: Home.php");
+    exit;
+}
 $email = $password = "";
 $email_err = $password_err = "";
-
+$is_password_expired=0;
 // Processing form data when form is submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST")
-{
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validate email
-    if (empty(trim($_POST["username"])))
-    {
+    if (empty(trim($_POST["username"]))) {
         $email_err = "Please enter your email.";
-    }
-    else
-    {
+    } else {
         $email = trim($_POST["username"]);
     }
-
     // Validate password
-    if (empty(trim($_POST["password"])))
-    {
+    if (empty(trim($_POST["password"]))) {
         $password_err = "Please enter your password.";
-    }
-    else
-    {
+    } else {
         $password = trim($_POST["password"]);
     }
 
     // Validate credentials
-    if (empty($email_err) && empty($password_err))
-    {
-        $sql = "SELECT id,email,password,verified FROM users WHERE email = ?";
+    if (empty($email_err) && empty($password_err)) {
 
+        $sql = "SELECT id,email,password,verified,password_expires FROM users WHERE email = ?";
         // Prepares the statement
-        if ($stmt = mysqli_prepare($link, $sql))
-        {
+        if ($stmt = mysqli_prepare($link, $sql)) {
             // Binds variables
             mysqli_stmt_bind_param($stmt, "s", $param_email);
-
-            // Set parameter
+            // Set the parameter
             $param_email = $email;
-
             // Attempt to execute the prepared statement
-            if (mysqli_stmt_execute($stmt))
-            {
+
+            if (mysqli_stmt_execute($stmt)) {
                 // Store result
                 mysqli_stmt_store_result($stmt);
 
                 // Check if username exists
-                if (mysqli_stmt_num_rows($stmt) == 1)
-                {
+                if (mysqli_stmt_num_rows($stmt) == 1) {
                     // Bind result variables
-                    mysqli_stmt_bind_result($stmt, $id, $email, $hashed_password, $vefified);
-                    if (mysqli_stmt_fetch($stmt))
-                    {
-                        if ($vefified)
-                        {
-                            if (password_verify($password, $hashed_password))
-                            {
-                                // Password is correct, so start a new session
-                                if (!isset($_SESSION))
-                                {
+                    mysqli_stmt_bind_result($stmt, $id, $email, $hashed_password, $verified,$password_expires);
+                    if (mysqli_stmt_fetch($stmt)) {
+                      $now = new DateTime();
+                      if ($now->format('Y-m-d H:i:s')>$password_expires){
+                        $is_password_expired=1;
+                        $password_err = "You password has been expired. Please Reset your password.";
+                      }
+
+                        if ($verified && $is_password_expired==0) {
+                            if (password_verify($password, $hashed_password)) {
+                                // Password is correct, start a new session
+                                if (!isset($_SESSION)) {
                                     session_start();
                                 }
-
                                 // Store data in session variables
                                 $_SESSION["loggedin"] = true;
                                 $_SESSION["id"] = $id;
-
                                 // Redirects user to profile page
-
-                                header("location: home.php");
-                            }
-                            else
-                            {
+                                header("location: Home.php");
+                            } else {
                                 // Display an error message if password is not valid
                                 $password_err = "The password you entered was not correct.";
                             }
-                        }
-                        else
-                        {
+                        } else {
+                            if ($verified==0){
                             $alert = "We have sent you a verification email. Please verify your account to log in.";
                             echo "<script type='text/javascript'>alert('$alert');</script>";
+                          }
                         }
-                    }
-                    else
-                    {
+                    } else {
                         echo "Results were not fetched properly.";
                     }
-                }
-                else
-                {
+                } else {
                     $email_err = "No account found. Please sign up.";
                 }
-            }
-            else
-            {
+            } else {
                 echo "SQL failed executing the statement. Please try again later.";
             }
             // Close statement
             mysqli_stmt_close($stmt);
-        }
-        else
-        {
+        } else {
             echo "Preparing SQL statement failed. Please try again later.";
         }
     }
@@ -185,6 +157,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
                       		<input type="submit" class="btn btn-primary" value="Log In">
                         </div>
                         <div class="row"><p style="padding-top: 15px;padding-left: 52px;">Don't have an account? <a href="register.php">Sign up here</a>.</p></div>
+                        <div class="row"><p style="padding-top: 15px;padding-left: 52px;">Forgot your password? <a href="request-new-password.php">Reset here</a>.</p></div>
                     </form>
                 </div>
             </div>

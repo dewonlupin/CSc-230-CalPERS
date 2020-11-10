@@ -1,144 +1,43 @@
 <?php
 // Initialize the session
 session_start();
-
 // Include config file
 require_once "config.php";
-
 // Check if the user is logged in, if not then redirect them to login page
-if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true)
-{
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     header("location: login.php");
     exit;
 }
-
 // Define variables
-$new_password = $confirm_password = "";
-$new_password_err = $confirm_password_err = "";
 $total = "";
-// Processing form data when form is submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST")
-{
-    // Validate new password
-    if (empty(trim($_POST["new_password"])))
-    {
-        $new_password_err = "Please enter a password.";
-    }
-    elseif (strlen(trim($_POST["new_password"])) < 8)
-    {
-        $new_password_err = "Password must have at least eight characters.";
-    }
-    elseif (!preg_match('@[A-Z]@', trim($_POST["new_password"])))
-    {
-        $new_password_err = "Password must have at least one uppercase letter";
-    }
-    elseif (!preg_match('@[a-z]@', trim($_POST["new_password"])))
-    {
-        $new_password_err = "Password must have at least one lowercase letter";
-
-    }
-    elseif (!preg_match('@[0-9]@', trim($_POST["new_password"])))
-    {
-        $new_password_err = "Password must have at least one number digit";
-
-    }
-    elseif (!preg_match('@[^\w]@', trim($_POST["new_password"])))
-    {
-        $new_password_err = "Password must have at least one special character";
-    }
-
-    else
-    {
-        $new_password = trim($_POST["new_password"]);
-    }
-
-    // Validate confirm password
-    if (empty(trim($_POST["confirm_password"])))
-    {
-        $confirm_password_err = "Please confirm password.";
-    }
-    else
-    {
-        $confirm_password = trim($_POST["confirm_password"]);
-        if (empty($new_password_err) && ($new_password != $confirm_password))
-        {
-            $confirm_password_err = "Password did not match.";
-        }
-    }
-    // Check input errors before updating the database
-    if (empty($new_password_err) && empty($confirm_password_err))
-    {
-        // Prepare an update statement
-        $sql = "UPDATE users SET password = ? WHERE id = ?";
-
-        if ($stmt = mysqli_prepare($link, $sql))
-        {
-            // Bind variables to the prepared statement as parameters
-            mysqli_stmt_bind_param($stmt, "si", $param_password, $param_id);
-
-            // Set parameters
-            $param_password = password_hash($new_password, PASSWORD_DEFAULT);
-            $param_id = $_SESSION["id"];
-
-            // Attempt to execute the prepared statement
-            if (mysqli_stmt_execute($stmt))
-            {
-                // Password updated successfully. Destroy the session, and redirect to login page
-                session_destroy();
-                header("location: login.php");
-                exit();
-            }
-            else
-            {
-                echo "Failed Executing the SQL statement. Please try again later.";
-            }
-            // Close statement
-            mysqli_stmt_close($stmt);
-        }
-    }
-
-    // Close connection
-    mysqli_close($link);
-}
 $sql = "SELECT count(*) total FROM signatures WHERE user_id=?";
-if ($stmt = mysqli_prepare($link, $sql))
-{
+if ($stmt = mysqli_prepare($link, $sql)) {
     mysqli_stmt_bind_param($stmt, "i", $param_user_id);
     $param_user_id = $_SESSION["id"];
-    if (mysqli_stmt_execute($stmt))
-    {
+    if (mysqli_stmt_execute($stmt)) {
         mysqli_stmt_store_result($stmt);
-        if (mysqli_stmt_num_rows($stmt) == 1)
-        {
-            if (mysqli_stmt_bind_result($stmt, $total))
-            {
-                if (mysqli_stmt_fetch($stmt))
-                {
+        if (mysqli_stmt_num_rows($stmt) == 1) {
+            if (mysqli_stmt_bind_result($stmt, $total)) {
+                if (mysqli_stmt_fetch($stmt)) {
                     //echo "all good.";
 
-                }
-                else
-                {
+                } else {
                     echo "Failed fetching the values. Please try again later.";
                 }
-            }
-            else
-            {
+            } else {
                 echo "Failed binding the results";
             }
-        }
-        else
-        {
+        } else {
             echo "No account has found.";
         }
-        //close the statement
-        mysqli_stmt_close($stmt);
     }
-}
-else
-{
+    //close the statement
+    mysqli_stmt_close($stmt);
+} else {
     echo "failed at preparing the SQL statement.";
 }
+// Close connection
+mysqli_close($link);
 ?>
 
 <!DOCTYPE html>
@@ -329,11 +228,11 @@ else
         <div class="container-fluid">
           <div class="row mb-2">
             <div class="col-sm-6">
-             
+
             </div><!-- /.col -->
             <div class="col-sm-6">
               <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item"><a href="profile.php" style="color: #276a91">Home</a></li>
+                <li class="breadcrumb-item"><a href="Home.php" style="color: #276a91">Home</a></li>
               </ol>
             </div><!-- /.col -->
           </div><!-- /.row -->
@@ -343,16 +242,16 @@ else
             <!-- edit form column -->
             <div class="col-md-8 col-sm-6 col-xs-12 personal-info">
 
-            <h3 class="d-flex justify-content-center">Welcome to E signature Portal.</h3>
+            <h3 class="d-flex justify-content-center">Welcome to E-Signature Portal.</h3>
             <br><br>
-            <h5 id="sign">You have <?php echo $total; ?> Saved signature. You can go to <a href="Signature.php">signature Page</a> and edit the signature.</h5>
-            <h5 id="nosign">You don't have any signature saved. Please go to the <a href="Signature.php">signature Page</a> where you can draw your signature or Upload an image of a signature.</h5>
+            <h5 id="sign">You have <?php echo $total; ?> saved signature(s). You may go to the <a href="Signature.php">Signature page</a> to view them.</h5>
+            <h5 id="nosign">You don't have any saved signatures. Please go to the <a href="Signature.php">Signature page</a> where you can draw your signature or upload an image of a signature.</h5>
             <br><br>
-           
+
             </div>
         </div>
     <!-- /.content-wrapper -->
-    
+
 
     <!-- Control Sidebar -->
     <aside class="control-sidebar control-sidebar-dark">

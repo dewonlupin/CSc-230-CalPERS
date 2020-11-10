@@ -19,8 +19,9 @@ CREATE TABLE `users` (
   `email` varchar(255) NOT NULL,
   `phone_number` varchar(30) DEFAULT NULL,
   `password` varchar(255) NOT NULL,
+  `password_expires` datetime NOT NULL,
   `token` varchar(255) NOT NULL,
-  `verified` tinyint(1) NOT NULL DEFAULT 1
+  `verified` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Indexes for table `users`

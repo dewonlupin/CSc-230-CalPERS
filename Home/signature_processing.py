@@ -1,23 +1,24 @@
 #!/usr/local/bin/python3.7
 
 import cv2
+from skimage.transform import resize
+from skimage import io
 
 # module to reduce the size and shape of the image. Takes image matrix as an input.
-def img_resize(img):
+def img_resize(image):
 
-    print('Original Dimensions : ',img.shape)
-
-    scale_width_percent = 30000 / img.shape[1]  # percent of original width size
-    scale_height_percent = 30000 / img.shape[0] # percent of original height size
-
-    width = int(img.shape[1] * scale_width_percent / 100)
-    height = int(img.shape[0] * scale_height_percent / 100)
-    dim = (width, height)
-
-    # resize image
-    resized = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
-
-    print('Resized Dimensions : ',resized.shape)
+    height = image.shape[0]
+    width  = image.shape[1]
+    aspect_ratio =  width / height
+    print("Aspect ratio: ", aspect_ratio)
+    print("Height:", height)
+    print("width:", width)
+    #for square-like images
+    if aspect_ratio < 1.3:
+        resized = resize(image, (300, 300), order=1, preserve_range=True,  clip= True, anti_aliasing=True)
+    #for rectangle-like images
+    else:
+        resized = resize(image, (250, 500), order=1, preserve_range=True,  clip= True, anti_aliasing=True)
 
     return resized
 
@@ -42,14 +43,15 @@ def noise_remover(img):
     return result
 
 
+
 def main():
 
     import cv2
-    import numpy as numpy
     import argparse
+    from skimage import img_as_ubyte
+    from skimage.util import img_as_float
 
     #**************************** storing image from command line argument ********************************
-
     ap = argparse.ArgumentParser()
 
     # takes path of the image as command line argument (after --path)
@@ -59,13 +61,21 @@ def main():
     # storing img into "image" variable
     image = cv2.imread(args["path"])
 
-    image = img_resize(image)
+
+
 
     #***************************** Image stored inside "image" variable *************************************
+    #image = cv2.imread("/Users/sarthakbhatt/Desktop/img2.png")
 
-    result = noise_remover(image)
+    pure = noise_remover(image)
+    #pure = img_as_float(pure)
+    cv2.imwrite("prep.png",pure)
+    prep_image =  io.imread(fname="prep.png", as_gray=False)
+    result = img_resize(prep_image)
 
-    cv2.imwrite('Prep_img.jpg', result)
+    io.imsave('Prep_img.png', img_as_float(result))
+
+    #io.imshow(result)
 
 if __name__ == "__main__":
     main()
